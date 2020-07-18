@@ -129,6 +129,9 @@ class MazeVisualizer:
         Initializes a maze grid with tiles and walls. Then update_tk_maze(r,c) can simply
         flip the colors to update the visualization. Trickier than draw_tk_maze() but faster.
         '''
+
+        self.canvas.delete(tkinter.ALL)
+
         self.wall_south = [ [0] * self.maze.N for _ in range(self.maze.N) ]
         self.wall_east  = [ [0] * self.maze.N for _ in range(self.maze.N) ]
         self.tiles      = [ [0] * self.maze.N for _ in range(self.maze.N) ]
@@ -158,28 +161,28 @@ class MazeVisualizer:
                         fill=color)
 
                 color = self.tile_color(r,c)
-                if self.maze.has_wall(r,c,mz.S): color='black'
+                if self.maze.has_wall(r,c,mz.E): color='black'
                 if c+1 < self.maze.N:
                     self.wall_east[r][c] = self.canvas.create_line(
                         (c+2)*width,(r+1)*width,
                         (c+2)*width,(r+2)*width,
                         fill='black')
 
-                # exterior walls
+        # exterior walls
 
-                x1 = self.tile_width
-                y1 = x1
+        x1 = self.tile_width
+        y1 = x1
 
-                x2 = self.tile_width + \
-                    self.maze.N * self.tile_width + \
-                    (self.maze.N-1) * self.wall_width + \
-                    self.wall_width * 3
-                y2 = x2
+        x2 = self.tile_width + \
+            self.maze.N * self.tile_width + \
+            (self.maze.N-1) * self.wall_width + \
+            self.wall_width * 3
+        y2 = x2
 
-                self.canvas.create_line(x1,y1, x1,y2, fill=self.BORDER_COLOR,width=3*self.wall_width)
-                self.canvas.create_line(x2,y1, x2,y2, fill=self.BORDER_COLOR,width=3*self.wall_width)
-                self.canvas.create_line(x1,y1, x2,y1, fill=self.BORDER_COLOR,width=3*self.wall_width)
-                self.canvas.create_line(x1,y2, x2,y2, fill=self.BORDER_COLOR,width=3*self.wall_width)
+        self.canvas.create_line(x1,y1, x1,y2, fill=self.BORDER_COLOR,width=3*self.wall_width,capstyle=tkinter.ROUND)
+        self.canvas.create_line(x2,y1, x2,y2, fill=self.BORDER_COLOR,width=3*self.wall_width,capstyle=tkinter.ROUND)
+        self.canvas.create_line(x1,y1, x2,y1, fill=self.BORDER_COLOR,width=3*self.wall_width,capstyle=tkinter.ROUND)
+        self.canvas.create_line(x1,y2, x2,y2, fill=self.BORDER_COLOR,width=3*self.wall_width,capstyle=tkinter.ROUND)
 
     def update_tk_maze(self,r,c,redraw=False):
         '''
@@ -188,29 +191,39 @@ class MazeVisualizer:
 
         if len(self.tiles) == 0: self.init_tk_maze()
 
+        # print("D: update_tk_maze [%d,%d] redraw=%s" % (r,c,redraw))
         # inside walls
         
         color = self.tile_color(r,c)
 
-        if self.maze.has_wall(r,c,mz.N) and r > 0:
-            self.canvas.itemconfig(self.wall_south[r-1][c], fill='black')
-        else:
-            self.canvas.itemconfig(self.wall_south[r-1][c], fill=color)
+        # tag_lower avoids chipping joints of existing walls when removing a wall
+        if r > 0:
+            if self.maze.has_wall(r,c,mz.N):
+                self.canvas.itemconfig(self.wall_south[r-1][c], fill='black')
+            else:
+                self.canvas.itemconfig(self.wall_south[r-1][c], fill=color)
+                self.canvas.tag_lower(self.wall_south[r-1][c])
 
-        if self.maze.has_wall(r,c,mz.S) and r < self.maze.N - 1:
-            self.canvas.itemconfig(self.wall_south[r][c], fill='black')
-        else:
-            self.canvas.itemconfig(self.wall_south[r][c], fill=color)
+        if r < self.maze.N - 1:
+            if self.maze.has_wall(r,c,mz.S):
+                self.canvas.itemconfig(self.wall_south[r][c], fill='black')
+            else:
+                self.canvas.itemconfig(self.wall_south[r][c], fill=color)
+                self.canvas.tag_lower(self.wall_south[r][c])
 
-        if self.maze.has_wall(r,c,mz.W) and c > 0:
-            self.canvas.itemconfig(self.wall_east[r][c-1], fill='black')
-        else:
-            self.canvas.itemconfig(self.wall_east[r][c-1], fill=color)
+        if c > 0:
+            if self.maze.has_wall(r,c,mz.W):
+                self.canvas.itemconfig(self.wall_east[r][c-1], fill='black')
+            else:
+                self.canvas.itemconfig(self.wall_east[r][c-1], fill=color)
+                self.canvas.tag_lower(self.wall_east[r][c-1])
 
-        if self.maze.has_wall(r,c,mz.E) and c < self.maze.N - 1:
-            self.canvas.itemconfig(self.wall_east[r][c], fill='black')
-        else:
-            self.canvas.itemconfig(self.wall_east[r][c], fill=color)
+        if c < self.maze.N - 1:
+            if self.maze.has_wall(r,c,mz.E):
+                self.canvas.itemconfig(self.wall_east[r][c], fill='black')
+            else:
+                self.canvas.itemconfig(self.wall_east[r][c], fill=color)
+                self.canvas.tag_lower(self.wall_east[r][c])
 
         self.canvas.itemconfig(self.tiles[r][c], fill=color)
 
