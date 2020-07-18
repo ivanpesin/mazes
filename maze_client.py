@@ -30,13 +30,14 @@ sys.setrecursionlimit(10**6)
 
 # parse the command line
 parser = argparse.ArgumentParser(description='Creates an NxN maze using the specified algorithm.')
-parser.add_argument('-a', default=0, type=int,   help="maze generation algorithm")
-parser.add_argument('--algs', action="store_true", help="list supported maze generation algorithms")
-parser.add_argument('-d', default=0, type=float, help="simulation delay in seconds, can be a fraction")
-parser.add_argument('-n', default=10, type=int,  help="maze dimention")
-parser.add_argument('-w', default=10, type=int,  help="tile width")
+parser.add_argument('-a',            default=0, type=int,   help="maze generation algorithm")
+parser.add_argument('--algs',        action="store_true",   help="list supported maze generation algorithms")
+parser.add_argument('-d',            default=0, type=float, help="simulation delay in seconds, can be a fraction")
+parser.add_argument('--start_delay', default=2, type=int,   help="delay on start, can be a fraction")
+parser.add_argument('-n',            default=10, type=int,  help="maze dimention")
+parser.add_argument('-w',            default=10, type=int,  help="tile width")
 parser.add_argument('--start', nargs=2, type=int, default=[0,0], help="maze entrance coordinates")
-parser.add_argument('--finish', nargs=2, type=int, help="maze exit coordinates")
+parser.add_argument('--finish', nargs=2, type=int,          help="maze exit coordinates")
 args = parser.parse_args()
 
 # show supported algorithms and exit
@@ -62,6 +63,7 @@ if x < 0 or x >= args.n or y < 0 or y >= args.n:
 tk = tkinter.Tk()
 tk.title('Maze')
 tk.geometry('+100+100')
+tk.lift()
 
 # create a maze; algs 0-4 start with empty maze and build walls, 
 # others carve doors in a maze full of walls
@@ -71,7 +73,8 @@ else: m = maze.Maze(N=args.n)
 # create visualizator to use with generation and solving of the maze
 vis = maze_visualizer.MazeVisualizer(m, tk, tile_width=args.w, delay=args.d)
 vis.draw_tk_maze()
-time.sleep(3)
+vis.set_statusbar('Start delay: %d sec ...' % args.start_delay)
+time.sleep(args.start_delay)
 
 # ---
 vis.set_statusbar('Generating the maze: %s' % ALGS_LIST[args.a])
