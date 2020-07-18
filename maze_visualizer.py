@@ -65,6 +65,10 @@ class MazeVisualizer:
         pass
 
     def draw_tk_maze(self):
+        '''
+        Simple TK-based maze visualization. Redraws the whole maze evey time it's called.
+        Slow on mazes larger than 30x30.
+        '''
 
         self.canvas.delete(tkinter.ALL)
 
@@ -121,6 +125,10 @@ class MazeVisualizer:
         self.tk_root.update()
 
     def init_tk_maze(self):
+        '''
+        Initializes a maze grid with tiles and walls. Then update_tk_maze(r,c) can simply
+        flip the colors to update the visualization. Trickier than draw_tk_maze() but faster.
+        '''
         self.wall_south = [ [0] * self.maze.N for _ in range(self.maze.N) ]
         self.wall_east  = [ [0] * self.maze.N for _ in range(self.maze.N) ]
         self.tiles      = [ [0] * self.maze.N for _ in range(self.maze.N) ]
@@ -173,7 +181,10 @@ class MazeVisualizer:
                 self.canvas.create_line(x1,y1, x2,y1, fill=self.BORDER_COLOR,width=3*self.wall_width)
                 self.canvas.create_line(x1,y2, x2,y2, fill=self.BORDER_COLOR,width=3*self.wall_width)
 
-    def update_tk_maze(self,r,c):
+    def update_tk_maze(self,r,c,redraw=False):
+        '''
+        Updates state of a single title, and redraws the change on request. Faster than draw_tk_maze(). 
+        '''
 
         if len(self.tiles) == 0: self.init_tk_maze()
 
@@ -203,7 +214,7 @@ class MazeVisualizer:
 
         self.canvas.itemconfig(self.tiles[r][c], fill=color)
 
-        self.tk_root.update()        
+        if redraw: self.canvas.update()        
 
     def set_statusbar(self, text):
         self.status.configure(text=text)
