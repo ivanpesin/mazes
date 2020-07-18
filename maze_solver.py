@@ -15,11 +15,7 @@ class dfs:
         self.solved = False
         self.visited = [ [False] * maze.N for _ in range(maze.N) ]
 
-        self.maze.add_tile_state(start_row, start_col, mz.ST_START)
-        self.maze.add_tile_state(end_row, end_col, mz.ST_END)
-        # updating the end position; start position will be updated 
-        # by solver when it starts waling
-        self.visualizer.update_tk_maze(end_row, end_col) 
+        self.visualizer.add_exits_tk_maze(start_row, start_col,end_row, end_col)
 
         self.maze_solver(start_row, start_col)
 
@@ -36,7 +32,7 @@ class dfs:
 
     def maze_solver(self, r,c):
         ''' Just a DFS implementation with visualizer updates '''
-        
+
         if self.solved == True: return
 
         self.visited[r][c] = True

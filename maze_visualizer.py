@@ -7,6 +7,11 @@ class MazeVisualizer:
     BACKGROUND_COLOR='white'
     BORDER_COLOR='navy'
 
+    COLORS = {
+        'START': 'red',
+        'END': 'green'
+    }
+
     def __init__(self, maze, tk_root, tile_width=10, wall_width=1, delay=0, ascii=False):
         self.maze = maze
         self.tk_root = tk_root
@@ -41,9 +46,9 @@ class MazeVisualizer:
         if self.maze.tile_state(r,c) & mz.ST_CURRENT:
             color = 'hot pink'
         elif self.maze.tile_state(r,c) & mz.ST_START:
-            color = 'maroon'                                  
+            color = self.COLORS['START']                           
         elif self.maze.tile_state(r,c) & mz.ST_END:
-            color = 'green'              
+            color = self.COLORS['END']             
         elif self.maze.tile_state(r,c) & mz.ST_PATH:
             color = 'pink'
         elif self.maze.tile_state(r,c) & mz.ST_CORRECT_PATH:
@@ -183,6 +188,69 @@ class MazeVisualizer:
         self.canvas.create_line(x2,y1, x2,y2, fill=self.BORDER_COLOR,width=3*self.wall_width,capstyle=tkinter.ROUND)
         self.canvas.create_line(x1,y1, x2,y1, fill=self.BORDER_COLOR,width=3*self.wall_width,capstyle=tkinter.ROUND)
         self.canvas.create_line(x1,y2, x2,y2, fill=self.BORDER_COLOR,width=3*self.wall_width,capstyle=tkinter.ROUND)
+
+    def add_exits_tk_maze(self, r1,c1,r2,c2):
+        ''' Creates entrance and exit in ext walls if necessary '''
+
+        width = self.tile_width + self.wall_width
+
+        # handling r1,c1
+        if r1 == 0:
+            self.canvas.create_line(
+                        (c1+1)*width,(r1+1)*width - self.wall_width, 
+                        (c1+2)*width,(r1+1)*width - self.wall_width,
+                        fill=self.COLORS['START'],
+                        width=3*self.wall_width)
+        elif r1 == self.maze.N-1:
+            self.canvas.create_line(
+                        (c1+1)*width,(r1+2)*width + self.wall_width, 
+                        (c1+2)*width,(r1+2)*width + self.wall_width,
+                        fill=self.COLORS['START'],
+                        width=3*self.wall_width)   
+        elif c1 == 0:
+             self.canvas.create_line(
+                        (c1+1)*width - self.wall_width, (r1+1)*width,
+                        (c1+1)*width - self.wall_width, (r1+2)*width,
+                        fill=self.COLORS['START'],
+                        width=3*self.wall_width)
+        elif c1 == self.maze.N-1:
+            self.canvas.create_line(
+                        (c1+2)*width - self.wall_width, (r1+1)*width,
+                        (c1+2)*width - self.wall_width, (r1+2)*width,
+                        fill=self.COLORS['START'],
+                        width=3*self.wall_width)   
+        else:
+            self.maze.add_tile_state(r1, c1, mz.ST_START)
+            self.update_tk_maze(r1, c1)                  
+        
+        # handling r2,c2
+        if r2 == 0:
+            self.canvas.create_line(
+                        (c2+1)*width,(r2+1)*width - self.wall_width, 
+                        (c2+2)*width,(r2+1)*width - self.wall_width,
+                        fill=self.COLORS['END'],
+                        width=3*self.wall_width)
+        elif r2 == self.maze.N-1:
+            self.canvas.create_line(
+                        (c2+1)*width,(r2+2)*width + self.wall_width, 
+                        (c2+2)*width,(r2+2)*width + self.wall_width,
+                        fill=self.COLORS['END'],
+                        width=3*self.wall_width)   
+        elif c2 == 0:
+             self.canvas.create_line(
+                        (c2+1)*width - self.wall_width, (r2+1)*width,
+                        (c2+1)*width - self.wall_width, (r2+2)*width,
+                        fill=self.COLORS['END'],
+                        width=3*self.wall_width)
+        elif c2 == self.maze.N-1:
+            self.canvas.create_line(
+                        (c2+2)*width - self.wall_width, (r2+1)*width,
+                        (c2+2)*width - self.wall_width, (r2+2)*width,
+                        fill=self.COLORS['END'],
+                        width=3*self.wall_width)
+        else:
+            self.maze.add_tile_state(r2, c2, mz.ST_END)     
+            self.update_tk_maze(r2, c2)                    
 
     def update_tk_maze(self,r,c,redraw=False):
         '''
