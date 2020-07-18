@@ -13,7 +13,8 @@ import sys
 ALGS_LIST = [
     'Recursive split 50/50',
     'Recursive split at random',
-    'Recursive backtracking'
+    'Recursive backtracking',
+    'Hunt-and-kill'
 ]
 
 def show_algs():
@@ -73,15 +74,15 @@ vis.draw_tk_maze()
 time.sleep(3)
 
 # ---
+vis.set_statusbar('Generating the maze: %s' % ALGS_LIST[args.a])
 if   args.a == 0: 
-    vis.set_statusbar('Generating the maze: recursive half-split')
     maze_generator.RecursiveSplit(m,vis)
 elif args.a == 1: 
-    vis.set_statusbar('Generating the maze: recursive random split')
     maze_generator.RecursiveSplit(m,vis,mode='random')
 elif args.a == 2: 
-    vis.set_statusbar('Generating the maze: recursive backtracking')
     maze_generator.RecursiveBacktracking(m,vis)
+elif args.a == 3: 
+    maze_generator.HuntAndKill(m,vis)
 
 vis.set_statusbar('Generated, sleeping 3 sec...')
 time.sleep(3)

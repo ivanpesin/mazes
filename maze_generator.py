@@ -121,3 +121,128 @@ class RecursiveBacktracking:
         self.maze.set_tile_state(r,c,mz.ST_VISITED)
         self.visualizer.update_tk_maze(r,c)
 
+class HuntAndKill:
+
+    def __init__(self, maze, visualizer):
+        self.maze = maze
+        self.visualizer = visualizer
+        self.scan_line_start = 0
+
+        self.visited = [ [False] * maze.N for _ in range(maze.N) ]
+
+        self.process(0,0)
+
+    def all_nbrs(self, r,c):
+        ''' return a list of neighbour cells in the maze '''
+        nbrs = []
+
+        if r-1 >= 0:          nbrs.append((r-1,c))
+        if r+1 < self.maze.N: nbrs.append((r+1,c))
+        if c-1 >= 0:          nbrs.append((r,c-1))
+        if c+1 < self.maze.N: nbrs.append((r,c+1))
+
+        return nbrs
+
+    def process(self, r,c):
+        ''' Loop through walking and hunting while not done '''
+        done = False
+        while not done:
+            r,c,deadend = self.walk(r,c)
+            if deadend: r,c,done = self.hunt()
+
+        #self.visualizer.draw_maze()
+
+    def walk(self, r,c):
+        ''' walk to next unvisited cell '''
+        
+        self.visited[r][c] = True
+
+        self.maze.add_tile_state(r,c,mz.ST_CURRENT | mz.ST_VISITED)
+        self.visualizer.update_tk_maze(r,c,redraw=True)
+        self.visualizer.sleep(div=2)
+        self.maze.clear_tile_state(r,c,mz.ST_CURRENT)
+        self.visualizer.update_tk_maze(r,c)
+
+        nbrs = self.all_nbrs(r,c)
+        random.shuffle(nbrs)
+
+        while len(nbrs) > 0:
+            nr, nc = nbrs.pop()
+            if self.visited[nr][nc]: continue
+            if nr-r == 1:
+                self.maze.remove_wall(r,c,mz.S)
+                self.maze.remove_wall(nr,nc,mz.N)
+            elif nr-r == -1:
+                self.maze.remove_wall(r,c,mz.N)
+                self.maze.remove_wall(nr,nc,mz.S)
+            elif nc-c == 1:
+                self.maze.remove_wall(r,c,mz.E)
+                self.maze.remove_wall(nr,nc,mz.W)
+            else:
+                self.maze.remove_wall(r,c,mz.W)
+                self.maze.remove_wall(nr,nc,mz.E)
+    
+            return nr,nc,False
+
+        # deadend
+        return r,c,True
+
+    def vis_scan_line(self, r):
+        ''' highlights the scanning row in visualizer '''
+
+        # set tile state
+        for c in range(self.maze.N):
+            self.maze.add_tile_state(r,c,mz.ST_CORRECT_PATH)
+            self.visualizer.update_tk_maze(r,c)
+
+        # redraw
+        self.visualizer.update_tk_maze(r,0,redraw=True)
+        self.visualizer.sleep(div=2)
+
+        # clear tile state
+        for c in range(self.maze.N):
+            self.maze.clear_tile_state(r,c,mz.ST_CORRECT_PATH)
+            self.visualizer.update_tk_maze(r,c)
+
+    def hunt(self):
+        ''' 
+        find an unvisited cell adjacent to a visited one;
+        remove the wall between two and use unvisited cell 
+        as a starting lcation for a walk
+        '''
+        for r in range(self.scan_line_start,self.maze.N):
+            self.vis_scan_line(r)
+            for c in range(self.maze.N):
+                if not self.visited[r][c]:
+                    nbrs = self.all_nbrs(r,c)
+                    random.shuffle(nbrs)
+
+                    while len(nbrs) > 0:
+                        nr, nc = nbrs.pop()
+                        if not self.visited[nr][nc]: continue
+                        # carve wall and return
+                        if nr-r == 1:
+                            self.maze.remove_wall(r,c,mz.S)
+                            self.maze.remove_wall(nr,nc,mz.N)
+                        elif nr-r == -1:
+                            self.maze.remove_wall(r,c,mz.N)
+                            self.maze.remove_wall(nr,nc,mz.S)
+                        elif nc-c == 1:
+                            self.maze.remove_wall(r,c,mz.E)
+                            self.maze.remove_wall(nr,nc,mz.W)
+                        else:
+                            self.maze.remove_wall(r,c,mz.W)
+                            self.maze.remove_wall(nr,nc,mz.E)                        
+                        return r,c,False
+
+            # this row has no unvisited cells, so
+            # skip re-scanning it
+            self.scan_line_start += 1
+
+        # no unvisited tiles
+        return 0,0,True
+
+
+
+
+
