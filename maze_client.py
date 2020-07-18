@@ -11,12 +11,13 @@ import random
 import sys
 
 ALGS_LIST = [
-    'Recursive splitting 50/50',
-    'Recursive splitting at random',
+    'Recursive split 50/50',
+    'Recursive split at random',
     'Recursive backtracking'
 ]
 
 def show_algs():
+    ''' Lists supported maze generation algorithms '''
     print("List of supported maze generation algorithms:\n")
     for i, name in enumerate(ALGS_LIST):
         print("\t%d\t%s" % (i, name))
@@ -24,6 +25,7 @@ def show_algs():
     
 # init random generator
 random.seed()
+sys.setrecursionlimit(10**6) 
 
 # parse the command line
 parser = argparse.ArgumentParser(description='Creates an NxN maze using the specified algorithm.')
@@ -32,11 +34,28 @@ parser.add_argument('--algs', action="store_true", help="list supported maze gen
 parser.add_argument('-d', default=0, type=float, help="simulation delay in seconds, can be a fraction")
 parser.add_argument('-n', default=10, type=int,  help="maze dimention")
 parser.add_argument('-w', default=10, type=int,  help="tile width")
+parser.add_argument('--start', nargs=2, type=int, default=[0,0], help="maze entrance coordinates")
+parser.add_argument('--finish', nargs=2, type=int, help="maze exit coordinates")
 args = parser.parse_args()
 
+# show supported algorithms and exit
 if args.algs:
     show_algs()
     sys.exit()
+
+# check start/finish coordinates are valid
+x, y = args.start
+if x < 0 or x >= args.n or y < 0 or y >= args.n:
+    print('Error: starting position [%d,%d] is out of maze [0..%d]' % (x,y,args.n-1), file=sys.stderr)
+    sys.exit(1)
+
+if args.finish is None: args.finish = [ args.n-1, args.n-1 ]
+x, y = args.finish
+
+if x < 0 or x >= args.n or y < 0 or y >= args.n:
+    print('Error: finishing position [%d,%d] is out of maze [0..%d]' % (x,y,args.n-1), file=sys.stderr)
+    sys.exit(1)
+
 
 # create tkinter root
 tk = tkinter.Tk()
@@ -68,7 +87,7 @@ vis.set_statusbar('Generated, sleeping 3 sec...')
 time.sleep(3)
 
 vis.set_statusbar('Solving the maze...')
-maze_solver.dfs(m,vis,0,0,m.N-1,m.N-1)
+maze_solver.dfs(m,vis,*args.start,*args.finish)
 
 vis.set_statusbar('Solved, close the window to exit.')
 tk.mainloop()
