@@ -166,7 +166,7 @@ class MazeVisualizer:
                     self.wall_east[r][c] = self.canvas.create_line(
                         (c+2)*width,(r+1)*width,
                         (c+2)*width,(r+2)*width,
-                        fill='black')
+                        fill=color)
 
         # exterior walls
 
