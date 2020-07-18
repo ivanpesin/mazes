@@ -86,9 +86,10 @@ class RecursiveBacktracking:
         self.visited[r][c] = True
 
         self.maze.add_tile_state(r,c,mz.ST_CURRENT | mz.ST_PATH)
-        self.visualizer.draw_maze()
+        self.visualizer.update_tk_maze(r,c,redraw=True)
         self.visualizer.sleep(div=2)
         self.maze.clear_tile_state(r,c,mz.ST_CURRENT)
+        self.visualizer.update_tk_maze(r,c)
 
         nbrs = self.all_nbrs(r,c)
         random.shuffle(nbrs)
@@ -112,9 +113,11 @@ class RecursiveBacktracking:
             self.carve(nr, nc)
 
             self.maze.add_tile_state(r,c,mz.ST_CURRENT | mz.ST_PATH)
-            self.visualizer.draw_maze()
-            self.visualizer.sleep(div=2)
+            self.visualizer.update_tk_maze(r,c,redraw=True)
+            self.visualizer.sleep(div=2)                
             self.maze.clear_tile_state(r,c,mz.ST_CURRENT)
+            self.visualizer.update_tk_maze(r,c)
 
         self.maze.set_tile_state(r,c,mz.ST_VISITED)
+        self.visualizer.update_tk_maze(r,c)
 

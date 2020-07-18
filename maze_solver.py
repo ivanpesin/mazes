@@ -17,6 +17,9 @@ class dfs:
 
         self.maze.add_tile_state(start_row, start_col, mz.ST_START)
         self.maze.add_tile_state(end_row, end_col, mz.ST_END)
+        # updating the end position; start position will be updated 
+        # by solver when it starts waling
+        self.visualizer.update_tk_maze(end_row, end_col) 
 
         self.maze_solver(start_row, start_col)
 
@@ -32,15 +35,17 @@ class dfs:
         return nbrs
 
     def maze_solver(self, r,c):
-
+        ''' Just a DFS implementation with visualizer updates '''
+        
         if self.solved == True: return
 
         self.visited[r][c] = True
 
         self.maze.add_tile_state(r,c,mz.ST_CURRENT | mz.ST_CORRECT_PATH)
-        self.visualizer.draw_tk_maze()
+        self.visualizer.update_tk_maze(r,c,redraw=True)
         self.visualizer.sleep(div=2)
         self.maze.clear_tile_state(r,c,mz.ST_CURRENT)
+        self.visualizer.update_tk_maze(r,c)
 
         if (r,c) == (self.end_row, self.end_col):
             self.solved = True
@@ -56,9 +61,11 @@ class dfs:
 
                 if not self.solved: # don't backtrack the correct path
                     self.maze.add_tile_state(r,c,mz.ST_CURRENT | mz.ST_CORRECT_PATH)
-                    self.visualizer.draw_tk_maze()
+                    self.visualizer.update_tk_maze(r,c,redraw=True)
                     self.visualizer.sleep(div=2)
                     self.maze.clear_tile_state(r,c,mz.ST_CURRENT)
+                    self.visualizer.update_tk_maze(r,c)
 
         if not self.solved: # don't backtrack the correct path
             self.maze.set_tile_state(r,c,mz.ST_DEADEND)
+            self.visualizer.update_tk_maze(r,c)
