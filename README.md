@@ -5,9 +5,9 @@ Python implementations for maze generation, visualization, and solving.
 
 ## Intro
 
-TODO:
+I've stumbled upon an article about an archeological examination of a game for Atari called [Entombed](https://en.wikipedia.org/wiki/Entombed_(Atari_2600)). The interesting part was about an endless maze generation with laughably small memory available (literally few dozen bites). This made me realize I have never looked into maze generation, so I went to wikipedia's [Maze Generation Algorithm](https://en.wikipedia.org/wiki/Maze_generation_algorithm) page and instantly wanted to implement recursive split algorithm. It was also a good opportunity to figure out Python's standard `tkinter` GUI library.
 
-Source: http://weblog.jamisbuck.org/under-the-hood/
+Doing some research I found an abosultely amazing [Jamis Buck's blog](http://weblog.jamisbuck.org/under-the-hood/) with 12 (!!!) algorithms for maze generation and this got me hooked. I had to implement a generic mini framework for maze generation, solving, and visualization, where you can simply add a class with a generator or a solver, and get a nice visualization.
 
 - [Intro](#intro)
 - [Syntax](#syntax)
@@ -16,6 +16,7 @@ Source: http://weblog.jamisbuck.org/under-the-hood/
   - [Recursive backtracking](#recursive-backtracking)
   - [Hunt-and-kill](#hunt-and-kill)
   - [Binary tree algorithm](#binary-tree-algorithm)
+- [Links](#links)
 - [TODO](#todo)
 
 ## Syntax
@@ -77,12 +78,20 @@ Does not require state, extremely simple to implement. The downside is an expres
 
 ![](images/maze-bt-se.gif)
 
+## Links
+
+* [Entombed](https://en.wikipedia.org/wiki/Entombed_(Atari_2600))
+* [Maze Generation Algorithm](https://en.wikipedia.org/wiki/Maze_generation_algorithm)
+* [Jamis Buck's blog](http://weblog.jamisbuck.org/under-the-hood/)
+* [Maze Classification](http://www.astrolog.org/labyrnth/algrithm.htm)
+
 ## TODO
 
 - [x] Fix wall chipping
 - [x] Add starting and finishing locations for the maze solver
 - [x] Hunt and kill alg
 - [ ] Growing tree alg
-- [ ] Binary tree alg
+- [x] Binary tree alg
+- [x] Add BFS solver
 - [ ] ASCII representation for mazes
 - [ ] Options to skip maze generation and solving animations
