@@ -15,6 +15,7 @@ Source: http://weblog.jamisbuck.org/under-the-hood/
   - [Recursive split](#recursive-split)
   - [Recursive backtracking](#recursive-backtracking)
   - [Hunt-and-kill](#hunt-and-kill)
+  - [Binary tree algorithm](#binary-tree-algorithm)
 - [TODO](#todo)
 
 ## Syntax
@@ -67,6 +68,14 @@ Does not require backtracking, thus generates less windy passages
 `$ python3 maze_client.py -n 10 -w 30 -a 3 -d 0.15 --start 4 4 --finish 9 4`
 
 ![](images/maze-hunt-and-kill.gif)
+
+### Binary tree algorithm
+
+Does not require state, extremely simple to implement. The downside is an express bias; below example has a south-east bias.
+
+`$ python3 maze_client.py -n 10 -w 30 -a 4 -d 0.07 --finish 9 4`
+
+![](images/maze-bt-se.gif)
 
 ## TODO
 
