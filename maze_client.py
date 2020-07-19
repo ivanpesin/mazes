@@ -66,29 +66,25 @@ tk.title('Maze')
 tk.geometry('+100+100')
 tk.lift()
 
-# create a maze; algs 0-4 start with empty maze and build walls, 
+# create a maze; some algs start with an empty maze and build walls, 
 # others carve doors in a maze full of walls
 if args.a in [0,1]: m = maze.Maze(N=args.n, walls=False)
 else: m = maze.Maze(N=args.n)
 
 # create visualizator to use with generation and solving of the maze
 vis = maze_visualizer.MazeVisualizer(m, tk, tile_width=args.w, delay=args.d)
-vis.draw_tk_maze()
+vis.draw_maze()
 vis.set_statusbar('Start delay: %d sec ...' % args.start_delay)
 time.sleep(args.start_delay)
 
 # ---
 vis.set_statusbar('Generating the maze: %s' % ALGS_LIST[args.a])
-if   args.a == 0: 
-    maze_generators.RecursiveSplit(m,vis)
-elif args.a == 1: 
-    maze_generators.RecursiveSplit(m,vis,mode='random')
-elif args.a == 2: 
-    maze_generators.RecursiveBacktracking(m,vis)
-elif args.a == 3: 
-    maze_generators.HuntAndKill(m,vis)
-elif args.a == 4: 
-    maze_generators.BinaryTree(m,vis)
+
+if   args.a == 0: maze_generators.RecursiveSplit(m,vis)
+elif args.a == 1: maze_generators.RecursiveSplit(m,vis,mode='random')
+elif args.a == 2: maze_generators.RecursiveBacktracking(m,vis)
+elif args.a == 3: maze_generators.HuntAndKill(m,vis)
+elif args.a == 4: maze_generators.BinaryTree(m,vis)
 
 vis.set_statusbar('Generated, sleeping 3 sec...')
 time.sleep(3)

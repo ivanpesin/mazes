@@ -1,8 +1,15 @@
 
 
 N, S, E, W = 1, 2, 4, 8
-ST_CURRENT, ST_VISITED, ST_PATH, ST_DEADEND = 1,2,4,8
-ST_CORRECT_PATH, ST_START, ST_END = 16, 32, 64
+
+# cell states
+ST_CURRENT      = 1 << 0
+ST_VISITED      = 1 << 1
+ST_PATH         = 1 << 2
+ST_DEADEND      = 1 << 3
+ST_CORRECT_PATH = 1 << 4
+ST_START        = 1 << 5
+ST_END          = 1 << 6
 
 class Maze:
 
