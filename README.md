@@ -22,6 +22,7 @@ Doing some research I found an abosultely amazing [Jamis Buck's blog](http://web
 ## Syntax
 
 ```
+$ python3 maze_client.py -h
 usage: maze_client.py [-h] [-a A] [--algs] [-d D] [-n N] [-w W]
 
 Creates an NxN maze using the specified algorithm.
@@ -38,6 +39,15 @@ optional arguments:
   --start START START   maze entrance coordinates
   --finish FINISH FINISH
                         maze exit coordinates
+
+$ python3 maze_client.py --algs
+List of supported maze generation algorithms:
+
+        0       Recursive split 50/50
+        1       Recursive split at random
+        2       Recursive backtracking
+        3       Hunt-and-kill
+        4       Binary tree (SE biased)
 ```
 
 ## Examples
