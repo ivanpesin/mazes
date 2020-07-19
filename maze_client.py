@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import maze
-import maze_generator
+import maze_generators
 import maze_solver
 import maze_visualizer
 import tkinter
@@ -14,7 +14,8 @@ ALGS_LIST = [
     'Recursive split 50/50',
     'Recursive split at random',
     'Recursive backtracking',
-    'Hunt-and-kill'
+    'Hunt-and-kill',
+    'Binary tree (SE biased)'
 ]
 
 def show_algs():
@@ -79,13 +80,15 @@ time.sleep(args.start_delay)
 # ---
 vis.set_statusbar('Generating the maze: %s' % ALGS_LIST[args.a])
 if   args.a == 0: 
-    maze_generator.RecursiveSplit(m,vis)
+    maze_generators.RecursiveSplit(m,vis)
 elif args.a == 1: 
-    maze_generator.RecursiveSplit(m,vis,mode='random')
+    maze_generators.RecursiveSplit(m,vis,mode='random')
 elif args.a == 2: 
-    maze_generator.RecursiveBacktracking(m,vis)
+    maze_generators.RecursiveBacktracking(m,vis)
 elif args.a == 3: 
-    maze_generator.HuntAndKill(m,vis)
+    maze_generators.HuntAndKill(m,vis)
+elif args.a == 4: 
+    maze_generators.BinaryTree(m,vis)
 
 vis.set_statusbar('Generated, sleeping 3 sec...')
 time.sleep(3)

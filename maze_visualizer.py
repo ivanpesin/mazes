@@ -257,9 +257,10 @@ class MazeVisualizer:
         Updates state of a single title, and redraws the change on request. Faster than draw_tk_maze(). 
         '''
 
+        # construct visual representation of a maze on first call
         if len(self.tiles) == 0: self.init_tk_maze()
 
-        # print("D: update_tk_maze [%d,%d] redraw=%s" % (r,c,redraw))
+
         # inside walls
         
         color = self.tile_color(r,c)
@@ -295,11 +296,16 @@ class MazeVisualizer:
 
         self.canvas.itemconfig(self.tiles[r][c], fill=color)
 
-        if redraw: self.canvas.update()        
+        if redraw: 
+            self.canvas.update()   
+            self.sleep()     
 
     def set_statusbar(self, text):
         self.status.configure(text=text)
         self.status.update()
 
-    def sleep(self, div=1):
-        time.sleep(self.delay/div)
+    def set_delay(self, d):
+        self.__delay = d
+
+    def sleep(self):
+        time.sleep(self.delay)

@@ -15,6 +15,7 @@ class dfs:
         self.solved = False
         self.visited = [ [False] * maze.N for _ in range(maze.N) ]
 
+        # mark start and finish positions for the solver
         self.visualizer.add_exits_tk_maze(start_row, start_col,end_row, end_col)
 
         self.maze_solver(start_row, start_col)
@@ -39,7 +40,6 @@ class dfs:
 
         self.maze.add_tile_state(r,c,mz.ST_CURRENT | mz.ST_CORRECT_PATH)
         self.visualizer.update_tk_maze(r,c,redraw=True)
-        self.visualizer.sleep(div=2)
         self.maze.clear_tile_state(r,c,mz.ST_CURRENT)
         self.visualizer.update_tk_maze(r,c)
 
@@ -58,7 +58,6 @@ class dfs:
                 if not self.solved: # don't backtrack the correct path
                     self.maze.add_tile_state(r,c,mz.ST_CURRENT | mz.ST_CORRECT_PATH)
                     self.visualizer.update_tk_maze(r,c,redraw=True)
-                    self.visualizer.sleep(div=2)
                     self.maze.clear_tile_state(r,c,mz.ST_CURRENT)
                     self.visualizer.update_tk_maze(r,c)
 
