@@ -24,23 +24,34 @@ Doing some research I found an abosultely amazing [Jamis Buck's blog](http://web
 ## Syntax
 
 ```
-$ python3 maze_client.py -h
-usage: maze_client.py [-h] [-a A] [--algs] [-d D] [-n N] [-w W]
+usage: maze_client.py [-h] [-n N] [-a A] [--algs] [-m M] [-s S] [-d D]
+                      [--start_delay START_DELAY] [-w W] [--start row col]
+                      [--finish row col] [--solver {dfs,bfs}]
 
 Creates an NxN maze using the specified algorithm.
 
 optional arguments:
   -h, --help            show this help message and exit
+
+maze generation:
+  -n N                  maze size
   -a A                  maze generation algorithm
   --algs                list supported maze generation algorithms
+  -m M                  algorithm parameters, see alg list for details
+  -s S                  random seed, use to generate repeatable mazes
+
+maze visualization:
   -d D                  simulation delay in seconds, can be a fraction
   --start_delay START_DELAY
-                        delay on start, can be a fraction
-  -n N                  maze dimention
-  -w W                  tile width
-  --start START START   maze entrance coordinates
-  --finish FINISH FINISH
-                        maze exit coordinates
+                        start delay in seconds, can be a fraction
+  -w W                  tile width in px
+
+maze solving:
+  --start row col       maze entrance coordinates
+  --finish row col      maze exit coordinates
+  --solver {dfs,bfs}    maze solver algorithm
+
+Rows and columns indices start with 0 in the top-right corner.
 
 $ python3 maze_client.py --algs
 List of supported maze generation algorithms:
@@ -50,6 +61,7 @@ List of supported maze generation algorithms:
         2       Recursive backtracking
         3       Hunt-and-kill
         4       Binary tree (SE biased)
+        5       Growing tree (Prim's)
 ```
 
 ## Examples

@@ -29,16 +29,25 @@ def show_algs():
 # --- main
 
 # parse the command line
-parser = argparse.ArgumentParser(description='Creates an NxN maze using the specified algorithm.')
-parser.add_argument('-a',            default=0, type=int,   help="maze generation algorithm")
-parser.add_argument('--algs',        action="store_true",   help="list supported maze generation algorithms")
-parser.add_argument('-d',            default=0, type=float, help="simulation delay in seconds, can be a fraction")
-parser.add_argument('--start_delay', default=2, type=int,   help="delay on start, can be a fraction")
-parser.add_argument('-n',            default=10, type=int,  help="maze size")
-parser.add_argument('-s',            default=None, type=int,help="random seed")
-parser.add_argument('-w',            default=10, type=int,  help="tile width")
-parser.add_argument('--start', nargs=2, type=int, default=[0,0], help="maze entrance coordinates")
-parser.add_argument('--finish', nargs=2, type=int,          help="maze exit coordinates")
+parser = argparse.ArgumentParser(
+    description='Creates an NxN maze using the specified algorithm.',
+    epilog='Rows and columns indices start with 0 in the top-right corner.')
+parser_gen = parser.add_argument_group('maze generation')
+parser_gen.add_argument('-n',            default=10, type=int,  help="maze size")
+parser_gen.add_argument('-a',            default=0, type=int,   help="maze generation algorithm")
+parser_gen.add_argument('--algs',        action="store_true",   help="list supported maze generation algorithms")
+parser_gen.add_argument('-m',            type=str,  help="algorithm parameters, see alg list for details")
+parser_gen.add_argument('-s',            default=None, type=int,help="random seed, use to generate repeatable mazes")
+
+parser_vis = parser.add_argument_group('maze visualization')
+parser_vis.add_argument('-d',            default=0, type=float, help="simulation delay in seconds, can be a fraction")
+parser_vis.add_argument('--start_delay', default=2, type=int,   help="start delay in seconds, can be a fraction")
+parser_vis.add_argument('-w',            default=10, type=int,  help="tile width in px")
+
+parser_sol = parser.add_argument_group('maze solving')
+parser_sol.add_argument('--start',       nargs=2, type=int,     help="maze entrance coordinates", default=[0,0], metavar=('row', 'col'))
+parser_sol.add_argument('--finish',      nargs=2, type=int,     help="maze exit coordinates", metavar=('row', 'col'))
+parser_sol.add_argument('--solver', default='dfs', choices=['dfs','bfs'], help="maze solver algorithm")
 args = parser.parse_args()
 
 # show supported algorithms and exit
