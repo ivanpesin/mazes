@@ -135,7 +135,7 @@ class MazeVisualizer:
         self.canvas.create_line(x1,y1, x2,y1, fill=self.COLORS['BORDER'],width=3*self.wall_width,capstyle=tkinter.ROUND)
         self.canvas.create_line(x1,y2, x2,y2, fill=self.COLORS['BORDER'],width=3*self.wall_width,capstyle=tkinter.ROUND)
 
-    def add_exits_tk_maze(self, r1,c1,r2,c2):
+    def mark_exits(self, r1,c1,r2,c2):
         ''' Creates entrance and exit in ext walls if necessary '''
 
         width = self.tile_width + self.wall_width
