@@ -21,10 +21,11 @@ def heading(r,c,nr,nc):
 
 class RecursiveSplit:
 
-    def __init__(self, maze, visualizer, mode='halves'):
+    def __init__(self, maze, visualizer, animate=False, mode='halves'):
         self.maze = maze
         self.visualizer = visualizer
         self.mode = mode
+        self.animate = animate
 
         self.split(0,0,maze.N-1,maze.N-1,True)
 
@@ -45,12 +46,12 @@ class RecursiveSplit:
                 self.visualizer.update_tk_maze(r,pos)
 
             # redraw the maze
-            self.visualizer.update_tk_maze(r1,c1,redraw=True)
+            self.visualizer.update_tk_maze(r1,c1,redraw=self.animate)
 
             # pick a door at random
             door = random.randrange(r1,r2+1)
             self.maze.remove_wall(door,pos,mz.E)
-            self.visualizer.update_tk_maze(door,pos,redraw=True)
+            self.visualizer.update_tk_maze(door,pos,redraw=self.animate)
             
             # recursively split two new parts
             self.split(r1,c1,r2,pos,not vertical)
@@ -66,12 +67,12 @@ class RecursiveSplit:
                 self.visualizer.update_tk_maze(pos,c)
 
             # redraw the maze
-            self.visualizer.update_tk_maze(r1,c1,redraw=True)
+            self.visualizer.update_tk_maze(r1,c1,redraw=self.animate)
 
             # pick a door at random
             door = random.randrange(c1,c2+1)
             self.maze.remove_wall(pos,door,mz.S)
-            self.visualizer.update_tk_maze(pos,door,redraw=True)
+            self.visualizer.update_tk_maze(pos,door,redraw=self.animate)
 
             # recursively split two new parts
             self.split(r1,c1,pos,c2,not vertical)
@@ -249,10 +250,11 @@ class GrowingTree:
     3. Repeat #2 until C is empty.
     '''
 
-    def __init__(self, maze, visualizer, mode='r'):
+    def __init__(self, maze, visualizer, animate=False, mode='r'):
         self.maze = maze
         self.visualizer = visualizer
         self.mode = mode
+        self.animate = animate
 
         self.visited = [ [False] * maze.N for _ in range(maze.N) ]
 
@@ -262,7 +264,7 @@ class GrowingTree:
         self.visited[r][c] = True
 
         self.maze.set_tile_state(r,c, mz.ST_PATH | mz.ST_VISITED)
-        self.visualizer.update_tk_maze(r,c,redraw=True)
+        self.visualizer.update_tk_maze(r,c,redraw=self.animate)
         
         self.grow()
 
@@ -285,7 +287,7 @@ class GrowingTree:
                 self.frontier.remove((r,c))
 
                 self.maze.clear_tile_state(r,c, mz.ST_PATH)
-                self.visualizer.update_tk_maze(r,c,redraw=True)
+                self.visualizer.update_tk_maze(r,c,redraw=self.animate)
                 continue
 
             nr, nc = random.choice(nbrs)
@@ -293,7 +295,7 @@ class GrowingTree:
             self.visited[nr][nc] = True
             
             self.maze.set_tile_state(nr,nc, mz.ST_PATH | mz.ST_VISITED)
-            self.visualizer.update_tk_maze(nr,nc,redraw=True)
+            self.visualizer.update_tk_maze(nr,nc,redraw=self.animate)
 
             if (nr,nc) not in self.frontier:
                 self.frontier.append((nr,nc))

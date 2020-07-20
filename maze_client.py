@@ -42,6 +42,7 @@ parser_gen.add_argument('-s',            default=None, type=int,help="random see
 parser_vis = parser.add_argument_group('maze visualization')
 parser_vis.add_argument('-d',            default=0, type=float, help="simulation delay in seconds, can be a fraction")
 parser_vis.add_argument('--start_delay', default=2, type=int,   help="start delay in seconds, can be a fraction")
+parser_vis.add_argument('--animate',     default='both', choices=['no','gen','sol','both'], help="algorithms animation")
 parser_vis.add_argument('-w',            default=10, type=int,  help="tile width in px")
 
 parser_sol = parser.add_argument_group('maze solving')
@@ -89,22 +90,29 @@ vis.draw_maze()
 vis.set_statusbar('Start delay: %d sec ...' % args.start_delay)
 time.sleep(args.start_delay)
 
-# ---
+# generating
 vis.set_statusbar('Generating the maze: %s' % ALGS_LIST[args.a])
 
-if   args.a == 0: maze_generators.RecursiveSplit(m,vis)
-elif args.a == 1: maze_generators.RecursiveSplit(m,vis,mode='random')
+animate = True if args.animate in [ 'gen','both' ] else False
+
+if   args.a == 0: maze_generators.RecursiveSplit(m,vis,animate=animate)
+elif args.a == 1: maze_generators.RecursiveSplit(m,vis,animate=animate,mode='random')
 elif args.a == 2: maze_generators.RecursiveBacktracking(m,vis)
 elif args.a == 3: maze_generators.HuntAndKill(m,vis)
 elif args.a == 4: maze_generators.BinaryTree(m,vis)
-elif args.a == 5: maze_generators.GrowingTree(m,vis)
+elif args.a == 5: maze_generators.GrowingTree(m,vis,animate=animate)
 
 
 vis.set_statusbar('Generated, sleeping 3 sec...')
 time.sleep(3)
 
-vis.set_statusbar('Solving the maze...')
-maze_solver.dfs(m,vis,*args.start,*args.finish)
+# solving
+vis.set_statusbar('Solving the maze using %s' % args.solver)
+
+animate = True if args.animate in [ 'sol','both' ] else False
+
+if args.solver == 'dfs': maze_solver.dfs(m,vis,*args.start,*args.finish,animate=animate)
+else: maze_solver.bfs(m,vis,*args.start,*args.finish,animate=animate)
 
 vis.set_statusbar('Solved, close the window to exit.')
 tk.mainloop()
