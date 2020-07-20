@@ -94,7 +94,7 @@ class RecursiveBacktracking:
         nbrs = list_nbrs(self.maze.N, r,c)
         random.shuffle(nbrs)
 
-        while len(nbrs) > 0:
+        while nbrs:
             nr, nc = nbrs.pop()
             if self.visited[nr][nc]: continue
 
@@ -147,7 +147,7 @@ class HuntAndKill:
         nbrs = list_nbrs(self.maze.N, r,c)
         random.shuffle(nbrs)
 
-        while len(nbrs) > 0:
+        while nbrs > 0:
             nr, nc = nbrs.pop()
             if self.visited[nr][nc]: continue
 
@@ -226,7 +226,7 @@ class BinaryTree:
                 if c < self.maze.N-1: headings.append(mz.E)
                 random.shuffle(headings)
 
-                if len(headings) > 0:
+                if headings > 0:
                     h = headings.pop()
                     self.maze.remove_wall(r,c,h)
                 
