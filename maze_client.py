@@ -15,7 +15,8 @@ ALGS_LIST = [
     'Recursive split at random',
     'Recursive backtracking',
     'Hunt-and-kill',
-    'Binary tree (SE biased)'
+    'Binary tree (SE biased)',
+    "Growing tree (Prim's)",
 ]
 
 def show_algs():
@@ -25,9 +26,7 @@ def show_algs():
         print("\t%d\t%s" % (i, name))
 
     
-# init random generator
-random.seed()
-sys.setrecursionlimit(10**6) 
+# --- main
 
 # parse the command line
 parser = argparse.ArgumentParser(description='Creates an NxN maze using the specified algorithm.')
@@ -35,7 +34,8 @@ parser.add_argument('-a',            default=0, type=int,   help="maze generatio
 parser.add_argument('--algs',        action="store_true",   help="list supported maze generation algorithms")
 parser.add_argument('-d',            default=0, type=float, help="simulation delay in seconds, can be a fraction")
 parser.add_argument('--start_delay', default=2, type=int,   help="delay on start, can be a fraction")
-parser.add_argument('-n',            default=10, type=int,  help="maze dimention")
+parser.add_argument('-n',            default=10, type=int,  help="maze size")
+parser.add_argument('-s',            default=None, type=int,help="random seed")
 parser.add_argument('-w',            default=10, type=int,  help="tile width")
 parser.add_argument('--start', nargs=2, type=int, default=[0,0], help="maze entrance coordinates")
 parser.add_argument('--finish', nargs=2, type=int,          help="maze exit coordinates")
@@ -59,6 +59,9 @@ if x < 0 or x >= args.n or y < 0 or y >= args.n:
     print('Error: finishing position [%d,%d] is out of maze [0..%d]' % (x,y,args.n-1), file=sys.stderr)
     sys.exit(1)
 
+# init random generator
+random.seed(args.s)
+sys.setrecursionlimit(10**6) 
 
 # create tkinter root
 tk = tkinter.Tk()
@@ -85,6 +88,8 @@ elif args.a == 1: maze_generators.RecursiveSplit(m,vis,mode='random')
 elif args.a == 2: maze_generators.RecursiveBacktracking(m,vis)
 elif args.a == 3: maze_generators.HuntAndKill(m,vis)
 elif args.a == 4: maze_generators.BinaryTree(m,vis)
+elif args.a == 5: maze_generators.GrowingTree(m,vis)
+
 
 vis.set_statusbar('Generated, sleeping 3 sec...')
 time.sleep(3)
