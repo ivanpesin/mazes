@@ -50,7 +50,7 @@ class dfs:
         nbrs = self.connected_nbrs(r,c)
         random.shuffle(nbrs)
 
-        while nbrs > 0:
+        while nbrs:
             nr, nc = nbrs.pop()
             if not self.visited[nr][nc]:
                 self.maze_solver(nr, nc)
