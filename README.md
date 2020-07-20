@@ -16,6 +16,8 @@ Doing some research I found an abosultely amazing [Jamis Buck's blog](http://web
   - [Recursive backtracking](#recursive-backtracking)
   - [Hunt-and-kill](#hunt-and-kill)
   - [Binary tree algorithm](#binary-tree-algorithm)
+  - [Growing tree algorithm](#growing-tree-algorithm)
+    - [Prim's](#prims)
 - [Links](#links)
 - [TODO](#todo)
 
@@ -87,6 +89,18 @@ Does not require state, extremely simple to implement. The downside is an expres
 `$ python3 maze_client.py -n 10 -w 30 -a 4 -d 0.07 --finish 9 4`
 
 ![](images/maze-bt-se.gif)
+
+### Growing tree algorithm
+
+An interesting algorithm which is simple to implement, while the behaviour can be changed with how you select next cell to process.
+
+#### Prim's 
+
+The algorithm becomes Prim's algorithm if the next cell is picked randomly from the stack:
+
+`$ python3 maze_client.py -n 10 -w 30 -d 0.07 -a 5  --finish 9 4`
+
+![](images/maze-gt-prim.gif)
 
 ## Links
 
