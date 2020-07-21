@@ -15,6 +15,7 @@ Doing some research I found an abosultely amazing [Jamis Buck's blog](http://web
   - [Recursive split](#recursive-split)
   - [Recursive backtracking](#recursive-backtracking)
   - [Hunt-and-kill](#hunt-and-kill)
+  - [Kruskal's algorithm](#kruskals-algorithm)
   - [Binary tree algorithm](#binary-tree-algorithm)
   - [Growing tree algorithm](#growing-tree-algorithm)
     - [Prim's](#prims)
@@ -94,11 +95,19 @@ Does not require backtracking, thus generates less windy passages
 
 ![](images/maze-hunt-and-kill.gif)
 
+### Kruskal's algorithm
+
+An easy to implement algorithm if you have UnionFind data structure. If you don't, UF is easy to implement too ;-)
+
+`python3 maze_client.py -n 10 -w 30 -d 0.07 -a 4 --solver bfs  --finish 9 4`
+
+![](images/maze-kruskal.gif)
+
 ### Binary tree algorithm
 
 Does not require state, extremely simple to implement. The downside is an express bias; below example has a south-east bias.
 
-`$ python3 maze_client.py -n 10 -w 30 -a 4 -d 0.07 --finish 9 4`
+`$ python3 maze_client.py -n 10 -w 30 -a 5 -d 0.07 --finish 9 4`
 
 ![](images/maze-bt-se.gif)
 
@@ -110,7 +119,7 @@ An interesting algorithm which is simple to implement, while the behaviour can b
 
 The algorithm becomes Prim's algorithm if the next cell is picked randomly from the stack:
 
-`$ python3 maze_client.py -n 10 -w 30 -d 0.07 -a 5  --finish 9 4`
+`$ python3 maze_client.py -n 10 -w 30 -d 0.07 -a 6  --finish 9 4`
 
 ![](images/maze-gt-prim.gif)
 
@@ -128,6 +137,7 @@ The algorithm becomes Prim's algorithm if the next cell is picked randomly from 
 - [x] Hunt and kill alg
 - [x] Growing tree alg
 - [x] Binary tree alg
+- [x] Kruskal's alg
 - [x] Add BFS solver
 - [ ] ASCII representation for mazes
 - [x] Options to skip maze generation and solving animations

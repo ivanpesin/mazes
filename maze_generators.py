@@ -1,6 +1,7 @@
 import maze as mz
 import maze_visualizer as mv
 import random
+import UF
 
 def nbrs_list(size,r,c):
     ''' return a list of neighbour cells in the maze '''
@@ -14,11 +15,18 @@ def nbrs_list(size,r,c):
     return nbrs
 
 def heading(r,c,nr,nc):
-    
+    ''' returns heading given two pairs of coords in a maze '''
     if nr-r == 1:    return mz.SOUTH
     elif nr-r == -1: return mz.NORTH
     elif nc-c == 1:  return mz.EAST
     else:            return mz.WEST
+
+def to_cell(r,c,h):
+    ''' returns cell coords given starting coords and heading '''
+    if h == mz.NORTH: return (r-1,c)
+    if h == mz.SOUTH: return (r+1,c)
+    if h == mz.EAST:  return (r,c+1)
+    if h == mz.WEST:  return (r,c-1)
 
 class RecursiveSplit:
 
@@ -285,5 +293,51 @@ class GrowingTree:
                 self.frontier.append((nr,nc))
 
 
-            
+class Kruskals:
+    '''
+    1. Put all edges into a bag
+    2. Pull out the edge with the lowest weight (or randomly for maze generation)
+    3. If the edge connects two disjoint trees, join the trees. Otherwise, 
+       throw that edge away.
+    4. Repeat until there are no more edges left.
+    '''
+
+    def __init__(self, maze, visualizer, animate=False):
+        self.maze = maze
+        self.visualizer = visualizer
+        self.animate = animate
+
+        self.edges = []
+        self.UF = UF.UF(maze.N ** 2)
+        for r in range(maze.N):
+            for c in range(maze.N):
+                if c < maze.N-1: self.edges.append((r,c,mz.EAST))
+                if r < maze.N-1: self.edges.append((r,c,mz.SOUTH))
+
+        random.shuffle(self.edges)
+        self.process()
+
+    def eid(self,r,c):
+        ''' calculate element id for UF '''
+        return r*self.maze.N + c
+
+    def process(self):
+        cnt = 0
+
+        while self.edges:
+            r, c, h = self.edges.pop()
+            nr, nc = to_cell(r,c,h)
+
+            if self.UF.connected(self.eid(r,c),self.eid(nr,nc)): continue
+
+            self.visualizer.set_tile_state(r,c,mv.ST_VISITED)
+
+            self.UF.union(self.eid(r,c),self.eid(nr,nc))
+
+            self.maze.remove_wall(r,c, heading(r,c,nr,nc))
+
+            # redraw only every third update
+            cnt += 1
+            redraw = True if cnt % 3 == 0 and self.animate else False
+            self.visualizer.set_tile_state(nr,nc,mv.ST_VISITED,redraw=redraw)
 

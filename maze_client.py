@@ -15,6 +15,7 @@ ALGS_LIST = [
     'Recursive split at random',
     'Recursive backtracking',
     'Hunt-and-kill',
+    "Kruskal's",
     'Binary tree (SE biased)',
     "Growing tree (Prim's)",
 ]
@@ -99,8 +100,9 @@ if   args.a == 0: maze_generators.RecursiveSplit(m,vis,animate=animate)
 elif args.a == 1: maze_generators.RecursiveSplit(m,vis,animate=animate,mode='random')
 elif args.a == 2: maze_generators.RecursiveBacktracking(m,vis,animate=animate)
 elif args.a == 3: maze_generators.HuntAndKill(m,vis,animate=animate)
-elif args.a == 4: maze_generators.BinaryTree(m,vis,animate=animate)
-elif args.a == 5: maze_generators.GrowingTree(m,vis,animate=animate)
+elif args.a == 4: maze_generators.Kruskals(m,vis,animate=animate)
+elif args.a == 5: maze_generators.BinaryTree(m,vis,animate=animate)
+elif args.a == 6: maze_generators.GrowingTree(m,vis,animate=animate)
 
 
 vis.set_statusbar('Generated, sleeping 3 sec...')
