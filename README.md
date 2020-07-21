@@ -126,8 +126,13 @@ The algorithm becomes Prim's algorithm if the next cell is picked randomly from 
 - [x] Fix wall chipping
 - [x] Add starting and finishing locations for the maze solver
 - [x] Hunt and kill alg
-- [ ] Growing tree alg
+- [x] Growing tree alg
 - [x] Binary tree alg
 - [x] Add BFS solver
 - [ ] ASCII representation for mazes
-- [ ] Options to skip maze generation and solving animations
+- [x] Options to skip maze generation and solving animations
+- [ ] Refactor Maze class to store walls as a bitmap
+- [x] Refactor direction names
+- [ ] Parameters support for splitting alg
+- [ ] Parameters support for GT alg
+- [x] Move tile state to visualizer

@@ -46,7 +46,7 @@ class RecursiveSplit:
                 self.maze.add_wall(r,pos,mz.EAST)
                 self.visualizer.update_tk_maze(r,pos)
 
-            self.visualizer.redraw_tk_maze()
+            if self.animate: self.visualizer.redraw_tk_maze()
 
             # pick a door at random
             door = random.randrange(r1,r2+1)
@@ -66,7 +66,7 @@ class RecursiveSplit:
                 self.maze.add_wall(pos,c,mz.SOUTH)
                 self.visualizer.update_tk_maze(pos,c)
 
-            self.visualizer.redraw_tk_maze
+            if self.animate: self.visualizer.redraw_tk_maze()
 
             # pick a door at random
             door = random.randrange(c1,c2+1)
@@ -79,9 +79,10 @@ class RecursiveSplit:
 
 class RecursiveBacktracking:
 
-    def __init__(self, maze, visualizer):
+    def __init__(self, maze, visualizer, animate=False):
         self.maze = maze
         self.visualizer = visualizer
+        self.animate = animate
 
         self.visited = [ [False] * maze.N for _ in range(maze.N) ]
 
@@ -92,7 +93,7 @@ class RecursiveBacktracking:
 
         self.visited[r][c] = True
 
-        self.visualizer.add_tile_state(r,c,mv.ST_CURRENT | mv.ST_PATH,redraw=True)
+        self.visualizer.add_tile_state(r,c,mv.ST_CURRENT | mv.ST_PATH,redraw=self.animate)
         self.visualizer.clear_tile_state(r,c,mv.ST_CURRENT)
 
         nbrs = nbrs_list(self.maze.N, r,c)
@@ -108,7 +109,7 @@ class RecursiveBacktracking:
             # recurse into new cell
             self.carve(nr, nc)
 
-            self.visualizer.add_tile_state(r,c,mv.ST_CURRENT | mv.ST_PATH,redraw=True)             
+            self.visualizer.add_tile_state(r,c,mv.ST_CURRENT | mv.ST_PATH,redraw=self.animate)             
             self.visualizer.clear_tile_state(r,c,mv.ST_CURRENT)
 
         # backtrack
@@ -116,9 +117,10 @@ class RecursiveBacktracking:
 
 class HuntAndKill:
 
-    def __init__(self, maze, visualizer):
+    def __init__(self, maze, visualizer, animate=False):
         self.maze = maze
         self.visualizer = visualizer
+        self.animate = animate
         self.scan_line_start = 0
 
         self.visited = [ [False] * maze.N for _ in range(maze.N) ]
@@ -137,7 +139,7 @@ class HuntAndKill:
         
         self.visited[r][c] = True
 
-        self.visualizer.add_tile_state(r,c,mv.ST_CURRENT | mv.ST_VISITED,redraw=True)
+        self.visualizer.add_tile_state(r,c,mv.ST_CURRENT | mv.ST_VISITED,redraw=self.animate)
         self.visualizer.clear_tile_state(r,c,mv.ST_CURRENT)
 
         nbrs = nbrs_list(self.maze.N, r,c)
@@ -162,7 +164,7 @@ class HuntAndKill:
         for c in range(self.maze.N):
             self.visualizer.add_tile_state(r,c,mv.ST_CORRECT_PATH)
         
-        self.visualizer.redraw_tk_maze()
+        if self.animate: self.visualizer.redraw_tk_maze()
         
         # clear tile state
         for c in range(self.maze.N):
@@ -199,9 +201,10 @@ class HuntAndKill:
 
 class BinaryTree:
 
-    def __init__(self, maze, visualizer):
+    def __init__(self, maze, visualizer, animate=False):
         self.maze = maze
         self.visualizer = visualizer
+        self.animate = animate
 
         self.generate(0,0)
 
@@ -220,7 +223,7 @@ class BinaryTree:
                     h = headings.pop()
                     self.maze.remove_wall(r,c,h)
                 
-                self.visualizer.add_tile_state(r,c,mv.ST_VISITED | mv.ST_CURRENT, redraw=True)
+                self.visualizer.add_tile_state(r,c,mv.ST_VISITED | mv.ST_CURRENT, redraw=self.animate)
                 self.visualizer.clear_tile_state(r,c,mv.ST_CURRENT)
                 
 class GrowingTree:

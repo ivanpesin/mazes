@@ -52,7 +52,7 @@ parser_sol.add_argument('--solver', default='dfs', choices=['dfs','bfs'], help="
 args = parser.parse_args()
 
 # show supported algorithms and exit
-if args.algs:
+if args.algs or args.a not in range(len(ALGS_LIST)):
     show_algs()
     sys.exit()
 
@@ -97,9 +97,9 @@ animate = True if args.animate in [ 'gen','both' ] else False
 
 if   args.a == 0: maze_generators.RecursiveSplit(m,vis,animate=animate)
 elif args.a == 1: maze_generators.RecursiveSplit(m,vis,animate=animate,mode='random')
-elif args.a == 2: maze_generators.RecursiveBacktracking(m,vis)
-elif args.a == 3: maze_generators.HuntAndKill(m,vis)
-elif args.a == 4: maze_generators.BinaryTree(m,vis)
+elif args.a == 2: maze_generators.RecursiveBacktracking(m,vis,animate=animate)
+elif args.a == 3: maze_generators.HuntAndKill(m,vis,animate=animate)
+elif args.a == 4: maze_generators.BinaryTree(m,vis,animate=animate)
 elif args.a == 5: maze_generators.GrowingTree(m,vis,animate=animate)
 
 
