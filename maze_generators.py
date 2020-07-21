@@ -1,4 +1,5 @@
 import maze as mz
+import maze_visualizer as mv
 import random
 
 def nbrs_list(size,r,c):
@@ -14,10 +15,10 @@ def nbrs_list(size,r,c):
 
 def heading(r,c,nr,nc):
     
-    if nr-r == 1:    return mz.S
-    elif nr-r == -1: return mz.N
-    elif nc-c == 1:  return mz.E
-    else:            return mz.W
+    if nr-r == 1:    return mz.SOUTH
+    elif nr-r == -1: return mz.NORTH
+    elif nc-c == 1:  return mz.EAST
+    else:            return mz.WEST
 
 class RecursiveSplit:
 
@@ -42,15 +43,14 @@ class RecursiveSplit:
             else: pos = c1 + random.randrange(c2-c1)
 
             for r in range(r1,r2+1):
-                self.maze.add_wall(r,pos,mz.E)
+                self.maze.add_wall(r,pos,mz.EAST)
                 self.visualizer.update_tk_maze(r,pos)
 
-            # redraw the maze
-            self.visualizer.update_tk_maze(r1,c1,redraw=self.animate)
+            self.visualizer.redraw_tk_maze()
 
             # pick a door at random
             door = random.randrange(r1,r2+1)
-            self.maze.remove_wall(door,pos,mz.E)
+            self.maze.remove_wall(door,pos,mz.EAST)
             self.visualizer.update_tk_maze(door,pos,redraw=self.animate)
             
             # recursively split two new parts
@@ -63,15 +63,14 @@ class RecursiveSplit:
             else: pos = r1 + random.randrange(r2-r1)
 
             for c in range(c1,c2+1):
-                self.maze.add_wall(pos,c,mz.S)
+                self.maze.add_wall(pos,c,mz.SOUTH)
                 self.visualizer.update_tk_maze(pos,c)
 
-            # redraw the maze
-            self.visualizer.update_tk_maze(r1,c1,redraw=self.animate)
+            self.visualizer.redraw_tk_maze
 
             # pick a door at random
             door = random.randrange(c1,c2+1)
-            self.maze.remove_wall(pos,door,mz.S)
+            self.maze.remove_wall(pos,door,mz.SOUTH)
             self.visualizer.update_tk_maze(pos,door,redraw=self.animate)
 
             # recursively split two new parts
@@ -93,10 +92,8 @@ class RecursiveBacktracking:
 
         self.visited[r][c] = True
 
-        self.maze.add_tile_state(r,c,mz.ST_CURRENT | mz.ST_PATH)
-        self.visualizer.update_tk_maze(r,c,redraw=True)
-        self.maze.clear_tile_state(r,c,mz.ST_CURRENT)
-        self.visualizer.update_tk_maze(r,c)
+        self.visualizer.add_tile_state(r,c,mv.ST_CURRENT | mv.ST_PATH,redraw=True)
+        self.visualizer.clear_tile_state(r,c,mv.ST_CURRENT)
 
         nbrs = nbrs_list(self.maze.N, r,c)
         random.shuffle(nbrs)
@@ -105,21 +102,17 @@ class RecursiveBacktracking:
             nr, nc = nbrs.pop()
             if self.visited[nr][nc]: continue
 
-            if nr-r == 1:    self.maze.remove_wall(r,c,mz.S)
-            elif nr-r == -1: self.maze.remove_wall(r,c,mz.N)
-            elif nc-c == 1:  self.maze.remove_wall(r,c,mz.E)
-            else:            self.maze.remove_wall(r,c,mz.W)
+            # remove wall
+            self.maze.remove_wall(r,c,heading(r,c,nr,nc))
 
+            # recurse into new cell
             self.carve(nr, nc)
 
-            self.maze.add_tile_state(r,c,mz.ST_CURRENT | mz.ST_PATH)
-            self.visualizer.update_tk_maze(r,c,redraw=True)               
-            self.maze.clear_tile_state(r,c,mz.ST_CURRENT)
-            self.visualizer.update_tk_maze(r,c)
+            self.visualizer.add_tile_state(r,c,mv.ST_CURRENT | mv.ST_PATH,redraw=True)             
+            self.visualizer.clear_tile_state(r,c,mv.ST_CURRENT)
 
         # backtrack
-        self.maze.set_tile_state(r,c,mz.ST_VISITED)
-        self.visualizer.update_tk_maze(r,c)
+        self.visualizer.set_tile_state(r,c,mv.ST_VISITED)
 
 class HuntAndKill:
 
@@ -136,20 +129,16 @@ class HuntAndKill:
         ''' Loop through walking and hunting while not done '''
         done = False
         while not done:
-            r,c,deadend = self.walk(r,c)
-            if deadend: r,c,done = self.hunt()
-
-        #self.visualizer.draw_maze()
+            r,c, deadend = self.walk(r,c)
+            if deadend: r,c, done = self.hunt()
 
     def walk(self, r,c):
         ''' walk to next unvisited cell '''
         
         self.visited[r][c] = True
 
-        self.maze.add_tile_state(r,c,mz.ST_CURRENT | mz.ST_VISITED)
-        self.visualizer.update_tk_maze(r,c,redraw=True)
-        self.maze.clear_tile_state(r,c,mz.ST_CURRENT)
-        self.visualizer.update_tk_maze(r,c)
+        self.visualizer.add_tile_state(r,c,mv.ST_CURRENT | mv.ST_VISITED,redraw=True)
+        self.visualizer.clear_tile_state(r,c,mv.ST_CURRENT)
 
         nbrs = nbrs_list(self.maze.N, r,c)
         random.shuffle(nbrs)
@@ -158,10 +147,8 @@ class HuntAndKill:
             nr, nc = nbrs.pop()
             if self.visited[nr][nc]: continue
 
-            if nr-r == 1:    self.maze.remove_wall(r,c,mz.S)
-            elif nr-r == -1: self.maze.remove_wall(r,c,mz.N)
-            elif nc-c == 1:  self.maze.remove_wall(r,c,mz.E)
-            else:            self.maze.remove_wall(r,c,mz.W)
+            # carve wall and return
+            self.maze.remove_wall(r,c,heading(r,c,nr,nc))
     
             return nr,nc,False
 
@@ -173,14 +160,13 @@ class HuntAndKill:
 
         # set tile state
         for c in range(self.maze.N):
-            self.maze.add_tile_state(r,c,mz.ST_CORRECT_PATH)
-            self.visualizer.update_tk_maze(r,c)
-        # redraw
-        self.visualizer.update_tk_maze(r,0,redraw=True)
+            self.visualizer.add_tile_state(r,c,mv.ST_CORRECT_PATH)
+        
+        self.visualizer.redraw_tk_maze()
+        
         # clear tile state
         for c in range(self.maze.N):
-            self.maze.clear_tile_state(r,c,mz.ST_CORRECT_PATH)
-            self.visualizer.update_tk_maze(r,c)
+            self.visualizer.clear_tile_state(r,c,mv.ST_CORRECT_PATH)
 
     def hunt(self):
         ''' 
@@ -226,18 +212,16 @@ class BinaryTree:
             for c in range(self.maze.N):
                 
                 headings = []
-                if r < self.maze.N-1: headings.append(mz.S)                
-                if c < self.maze.N-1: headings.append(mz.E)
+                if r < self.maze.N-1: headings.append(mz.SOUTH)                
+                if c < self.maze.N-1: headings.append(mz.EAST)
                 random.shuffle(headings)
 
-                if headings > 0:
+                if headings:
                     h = headings.pop()
                     self.maze.remove_wall(r,c,h)
                 
-                self.maze.add_tile_state(r,c,mz.ST_VISITED | mz.ST_CURRENT)
-                self.visualizer.update_tk_maze(r,c,redraw=True)
-                self.maze.clear_tile_state(r,c,mz.ST_CURRENT)
-                self.visualizer.update_tk_maze(r,c)
+                self.visualizer.add_tile_state(r,c,mv.ST_VISITED | mv.ST_CURRENT, redraw=True)
+                self.visualizer.clear_tile_state(r,c,mv.ST_CURRENT)
                 
 class GrowingTree:
     '''
@@ -263,8 +247,7 @@ class GrowingTree:
         self.frontier = [ (r,c) ]
         self.visited[r][c] = True
 
-        self.maze.set_tile_state(r,c, mz.ST_PATH | mz.ST_VISITED)
-        self.visualizer.update_tk_maze(r,c,redraw=self.animate)
+        self.visualizer.set_tile_state(r,c, mv.ST_PATH | mv.ST_VISITED, redraw=self.animate)
         
         self.grow()
 
@@ -286,16 +269,14 @@ class GrowingTree:
             if not nbrs:
                 self.frontier.remove((r,c))
 
-                self.maze.clear_tile_state(r,c, mz.ST_PATH)
-                self.visualizer.update_tk_maze(r,c,redraw=self.animate)
+                self.visualizer.clear_tile_state(r,c, mv.ST_PATH, redraw=self.animate)
                 continue
 
             nr, nc = random.choice(nbrs)
             self.maze.remove_wall(r,c,heading(r,c,nr,nc))
             self.visited[nr][nc] = True
             
-            self.maze.set_tile_state(nr,nc, mz.ST_PATH | mz.ST_VISITED)
-            self.visualizer.update_tk_maze(nr,nc,redraw=self.animate)
+            self.visualizer.set_tile_state(nr,nc, mv.ST_PATH | mv.ST_VISITED, redraw=self.animate)
 
             if (nr,nc) not in self.frontier:
                 self.frontier.append((nr,nc))

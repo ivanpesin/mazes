@@ -2,6 +2,15 @@ import time
 import tkinter
 import maze as mz
 
+# tile states
+ST_CURRENT      = 1 << 0
+ST_VISITED      = 1 << 1
+ST_PATH         = 1 << 2
+ST_DEADEND      = 1 << 3
+ST_CORRECT_PATH = 1 << 4
+ST_START        = 1 << 5
+ST_END          = 1 << 6
+
 class MazeVisualizer:
 
     COLORS = {
@@ -24,6 +33,8 @@ class MazeVisualizer:
         self.tile_width = tile_width
         self.wall_width = wall_width
         self.delay = delay 
+
+        self.tile_state = [ [0] * maze.N for _ in range(maze.N) ]
 
         self.draw_ascii = ascii
         self.draw_tk = False
@@ -49,19 +60,19 @@ class MazeVisualizer:
             self.status.pack()
 
     def tile_color(self,r,c):
-        if self.maze.tile_state(r,c) & mz.ST_CURRENT:
+        if self.tile_state[r][c] & ST_CURRENT:
             color = self.COLORS['CURRENT_TILE']  
-        elif self.maze.tile_state(r,c) & mz.ST_START:
+        elif self.tile_state[r][c] & ST_START:
             color = self.COLORS['START']                           
-        elif self.maze.tile_state(r,c) & mz.ST_END:
+        elif self.tile_state[r][c] & ST_END:
             color = self.COLORS['END']             
-        elif self.maze.tile_state(r,c) & mz.ST_PATH:
+        elif self.tile_state[r][c] & ST_PATH:
             color = self.COLORS['PATH_TILE']    
-        elif self.maze.tile_state(r,c) & mz.ST_CORRECT_PATH:
+        elif self.tile_state[r][c] & ST_CORRECT_PATH:
             color = self.COLORS['CORRECT_PATH_TILE']    
-        elif self.maze.tile_state(r,c) & mz.ST_VISITED:
+        elif self.tile_state[r][c] & ST_VISITED:
             color = self.COLORS['VISITED_TILE']    
-        elif self.maze.tile_state(r,c) & mz.ST_DEADEND:
+        elif self.tile_state[r][c] & ST_DEADEND:
             color = self.COLORS['DEADEND_TILE']                   
         else:
             color = self.COLORS['TILE']
@@ -104,7 +115,7 @@ class MazeVisualizer:
                     width=0
                 )
 
-                if self.maze.has_wall(r,c,mz.S): color=self.COLORS['WALL']
+                if self.maze.has_wall(r,c,mz.SOUTH): color=self.COLORS['WALL']
                 if r+1 < self.maze.N:
                     self.wall_south[r][c] = self.canvas.create_line(
                         (c+1)*width,(r+2)*width, 
@@ -112,7 +123,7 @@ class MazeVisualizer:
                         fill=color)
 
                 color = self.tile_color(r,c)
-                if self.maze.has_wall(r,c,mz.E): color=self.COLORS['WALL']
+                if self.maze.has_wall(r,c,mz.EAST): color=self.COLORS['WALL']
                 if c+1 < self.maze.N:
                     self.wall_east[r][c] = self.canvas.create_line(
                         (c+2)*width,(r+1)*width,
@@ -166,7 +177,7 @@ class MazeVisualizer:
                         fill=self.COLORS['START'],
                         width=3*self.wall_width)   
         else:
-            self.maze.add_tile_state(r1, c1, mz.ST_START)
+            self.maze.add_tile_state(r1, c1, ST_START)
             self.update_tk_maze(r1, c1)                  
         
         # handling r2,c2
@@ -195,7 +206,7 @@ class MazeVisualizer:
                         fill=self.COLORS['END'],
                         width=3*self.wall_width)
         else:
-            self.maze.add_tile_state(r2, c2, mz.ST_END)     
+            self.maze.add_tile_state(r2, c2, ST_END)     
             self.update_tk_maze(r2, c2)                    
 
     def update_tk_maze(self,r,c,redraw=False):
@@ -213,28 +224,28 @@ class MazeVisualizer:
 
         # tag_lower avoids chipping joints of existing walls when removing a wall
         if r > 0:
-            if self.maze.has_wall(r,c,mz.N):
+            if self.maze.has_wall(r,c,mz.NORTH):
                 self.canvas.itemconfig(self.wall_south[r-1][c], fill='black')
             else:
                 self.canvas.itemconfig(self.wall_south[r-1][c], fill=color)
                 self.canvas.tag_lower(self.wall_south[r-1][c])
 
         if r < self.maze.N - 1:
-            if self.maze.has_wall(r,c,mz.S):
+            if self.maze.has_wall(r,c,mz.SOUTH):
                 self.canvas.itemconfig(self.wall_south[r][c], fill='black')
             else:
                 self.canvas.itemconfig(self.wall_south[r][c], fill=color)
                 self.canvas.tag_lower(self.wall_south[r][c])
 
         if c > 0:
-            if self.maze.has_wall(r,c,mz.W):
+            if self.maze.has_wall(r,c,mz.WEST):
                 self.canvas.itemconfig(self.wall_east[r][c-1], fill='black')
             else:
                 self.canvas.itemconfig(self.wall_east[r][c-1], fill=color)
                 self.canvas.tag_lower(self.wall_east[r][c-1])
 
         if c < self.maze.N - 1:
-            if self.maze.has_wall(r,c,mz.E):
+            if self.maze.has_wall(r,c,mz.EAST):
                 self.canvas.itemconfig(self.wall_east[r][c], fill='black')
             else:
                 self.canvas.itemconfig(self.wall_east[r][c], fill=color)
@@ -252,8 +263,18 @@ class MazeVisualizer:
         self.status.configure(text=text)
         self.status.update()
 
-    def set_delay(self, d):
-        self.__delay = d
-
     def sleep(self):
         time.sleep(self.delay)
+
+
+    def set_tile_state(self, r,c, state, redraw=False):
+        self.tile_state[r][c] = state
+        self.update_tk_maze(r,c,redraw=redraw)
+
+    def add_tile_state(self, r,c, state, redraw=False):
+        self.tile_state[r][c] |= state
+        self.update_tk_maze(r,c,redraw=redraw)
+
+    def clear_tile_state(self, r,c, state, redraw=False):
+        self.tile_state[r][c] &= ~state
+        self.update_tk_maze(r,c,redraw=redraw)

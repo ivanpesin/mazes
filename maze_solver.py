@@ -1,5 +1,6 @@
 
 import maze as mz
+import maze_visualizer as mv
 import random
 
 class dfs:
@@ -25,10 +26,10 @@ class dfs:
         ''' return a list of connected nieghbour cells in the maze '''
         nbrs = []
 
-        if r-1 >= 0          and not self.maze.has_wall(r,c,mz.N): nbrs.append((r-1,c))
-        if r+1 < self.maze.N and not self.maze.has_wall(r,c,mz.S): nbrs.append((r+1,c))
-        if c-1 >= 0          and not self.maze.has_wall(r,c,mz.W): nbrs.append((r,c-1))
-        if c+1 < self.maze.N and not self.maze.has_wall(r,c,mz.E): nbrs.append((r,c+1))
+        if r-1 >= 0          and not self.maze.has_wall(r,c,mz.NORTH): nbrs.append((r-1,c))
+        if r+1 < self.maze.N and not self.maze.has_wall(r,c,mz.SOUTH): nbrs.append((r+1,c))
+        if c-1 >= 0          and not self.maze.has_wall(r,c,mz.WEST): nbrs.append((r,c-1))
+        if c+1 < self.maze.N and not self.maze.has_wall(r,c,mz.EAST): nbrs.append((r,c+1))
 
         return nbrs
 
@@ -39,10 +40,10 @@ class dfs:
 
         self.visited[r][c] = True
 
-        self.maze.add_tile_state(r,c,mz.ST_CURRENT | mz.ST_CORRECT_PATH)
-        self.visualizer.update_tk_maze(r,c,redraw=self.animate)
-        self.maze.clear_tile_state(r,c,mz.ST_CURRENT)
-        self.visualizer.update_tk_maze(r,c)
+        self.visualizer.add_tile_state(r,c,
+            mv.ST_CURRENT | mv.ST_CORRECT_PATH,
+            redraw=self.animate)
+        self.visualizer.clear_tile_state(r,c,mv.ST_CURRENT)
 
         if (r,c) == (self.end_row, self.end_col):
             self.solved = True
@@ -56,15 +57,14 @@ class dfs:
             if not self.visited[nr][nc]:
                 self.maze_solver(nr, nc)
 
-                if not self.solved: # don't backtrack the correct path
-                    self.maze.add_tile_state(r,c,mz.ST_CURRENT | mz.ST_CORRECT_PATH)
-                    self.visualizer.update_tk_maze(r,c,redraw=self.animate)
-                    self.maze.clear_tile_state(r,c,mz.ST_CURRENT)
-                    self.visualizer.update_tk_maze(r,c)
+                if not self.solved: # don't update the visualization once solved
+                    self.visualizer.add_tile_state(r,c,
+                        mv.ST_CURRENT | mv.ST_CORRECT_PATH,
+                        redraw=self.animate)
+                    self.visualizer.clear_tile_state(r,c,mv.ST_CURRENT)
 
         if not self.solved: # don't backtrack the correct path
-            self.maze.set_tile_state(r,c,mz.ST_DEADEND)
-            self.visualizer.update_tk_maze(r,c)
+            self.visualizer.set_tile_state(r,c,mv.ST_DEADEND)
 
 class bfs:
 
@@ -94,10 +94,10 @@ class bfs:
         ''' return a list of connected nieghbour cells in the maze '''
         nbrs = []
 
-        if r-1 >= 0          and not self.maze.has_wall(r,c,mz.N): nbrs.append((r-1,c))
-        if r+1 < self.maze.N and not self.maze.has_wall(r,c,mz.S): nbrs.append((r+1,c))
-        if c-1 >= 0          and not self.maze.has_wall(r,c,mz.W): nbrs.append((r,c-1))
-        if c+1 < self.maze.N and not self.maze.has_wall(r,c,mz.E): nbrs.append((r,c+1))
+        if r-1 >= 0          and not self.maze.has_wall(r,c,mz.NORTH): nbrs.append((r-1,c))
+        if r+1 < self.maze.N and not self.maze.has_wall(r,c,mz.SOUTH): nbrs.append((r+1,c))
+        if c-1 >= 0          and not self.maze.has_wall(r,c,mz.WEST): nbrs.append((r,c-1))
+        if c+1 < self.maze.N and not self.maze.has_wall(r,c,mz.EAST): nbrs.append((r,c+1))
 
         return nbrs
 
@@ -119,17 +119,15 @@ class bfs:
                 self.path_to[nr][nc] = (r,c)
                 
                 # just using DEADEND color to mark visited cells
-                self.maze.set_tile_state(r,c,mz.ST_DEADEND) 
-                self.visualizer.update_tk_maze(r,c,redraw=self.animate)
+                self.visualizer.set_tile_state(r,c,mv.ST_DEADEND,redraw=self.animate) 
 
             self.stack.extend(nbrs)
 
+        # mark the correct path
         (r,c) = (self.end_row,self.end_col)
         while (r,c) != (self.start_row,self.start_col):
-            self.maze.set_tile_state(r,c,mz.ST_CORRECT_PATH)
-            self.visualizer.update_tk_maze(r,c,redraw=self.animate)
+            self.visualizer.set_tile_state(r,c,mv.ST_CORRECT_PATH,redraw=self.animate)
             r,c = self.path_to[r][c]
 
-        self.maze.set_tile_state(r,c,mz.ST_CORRECT_PATH)
-        self.visualizer.update_tk_maze(r,c,redraw=self.animate)
+        self.visualizer.set_tile_state(r,c,mv.ST_CORRECT_PATH,redraw=self.animate)
         

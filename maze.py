@@ -1,15 +1,10 @@
 
 
-N, S, E, W = 1, 2, 4, 8
-
-# cell states
-ST_CURRENT      = 1 << 0
-ST_VISITED      = 1 << 1
-ST_PATH         = 1 << 2
-ST_DEADEND      = 1 << 3
-ST_CORRECT_PATH = 1 << 4
-ST_START        = 1 << 5
-ST_END          = 1 << 6
+# cardinal directions
+NORTH = 1 << 0
+SOUTH = 1 << 1
+EAST  = 1 << 2
+WEST  = 1 << 3
 
 class Maze:
 
@@ -21,47 +16,30 @@ class Maze:
         self.east  = [ [walls] * N for _ in range(N) ]
         self.west  = [ [walls] * N for _ in range(N) ]
 
-        self.state = [ [0] * N for _ in range(N) ]
+    def wall_bilder(self, r,c,side,has_wall):
 
-    def wall_bilder(self, r,c,direction,present):
-
-        if direction == N:
-            self.north[r][c] = present
-            if r > 0: 
-                self.south[r-1][c] = present
-        elif direction == S:
-            self.south[r][c] = present
-            if r+1 < self.N: 
-                self.north[r+1][c] = present
-        elif direction == E:
-            self.east[r][c] = present
-            if c+1 < self.N:
-                self.west[r][c+1] = present
+        if side == NORTH:
+            self.north[r][c] = has_wall
+            if r > 0: self.south[r-1][c] = has_wall
+        elif side == SOUTH:
+            self.south[r][c] = has_wall
+            if r+1 < self.N: self.north[r+1][c] = has_wall
+        elif side == EAST:
+            self.east[r][c] = has_wall
+            if c+1 < self.N: self.west[r][c+1] = has_wall
         else:
-            self.west[r][c]   = present
-            if c > 0:
-                self.east[r][c-1] = present
+            self.west[r][c]   = has_wall
+            if c > 0: self.east[r][c-1] = has_wall
 
-    def add_wall(self, r,c,d):
-        self.wall_bilder(r,c,d,True)
+    def add_wall(self, r,c,side):
+        self.wall_bilder(r,c,side,has_wall=True)
 
-    def remove_wall(self, r,c,d):
-        self.wall_bilder(r,c,d,False)
+    def remove_wall(self, r,c,side):
+        self.wall_bilder(r,c,side,has_wall=False)
 
-    def has_wall(self, r,c,d):
-        if d == N: return self.north[r][c]
-        if d == S: return self.south[r][c]  
-        if d == E: return self.east[r][c]  
-        if d == W: return self.west[r][c]  
+    def has_wall(self, r,c,side):
+        if side == NORTH: return self.north[r][c]
+        if side == SOUTH: return self.south[r][c]  
+        if side == EAST: return self.east[r][c]  
+        if side == WEST: return self.west[r][c]  
 
-    def set_tile_state(self, r,c, state):
-        self.state[r][c] = state
-
-    def add_tile_state(self, r,c, state):
-        self.state[r][c] |= state
-
-    def clear_tile_state(self, r,c, state):
-        self.state[r][c] &= ~state
-
-    def tile_state(self, r,c):
-        return self.state[r][c]
