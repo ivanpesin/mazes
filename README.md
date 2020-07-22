@@ -21,15 +21,16 @@ Doing some research I found an abosultely amazing [Jamis Buck's blog](http://web
     - [Always pick a random cell - Prim's:](#always-pick-a-random-cell---prims)
     - [Oldest vs Oldest/Newest 1:1](#oldest-vs-oldestnewest-11)
     - [Newest vs Newest/Random 1:1](#newest-vs-newestrandom-11)
-    - [Newest/Random/Oldest 1:1:2](#newestrandomoldest-112)
+    - [Newest/Random/Oldest 2:1:1 vs Newest/Random/Oldest 1:1:2](#newestrandomoldest-211-vs-newestrandomoldest-112)
 - [Links](#links)
 - [TODO](#todo)
 
 ## Syntax
 
 ```
-usage: maze_client.py [-h] [-n N] [-a A] [--algs] [-m M] [-s S] [-d D]
-                      [--start_delay START_DELAY] [-w W] [--start row col]
+usage: maze_client.py [-h] [-n N] [-a A] [--algs] [-p P] [-s S] [-d D]
+                      [--start_delay START_DELAY]
+                      [--animate {no,gen,sol,both}] [-w W] [--start row col]
                       [--finish row col] [--solver {dfs,bfs}]
 
 Creates an NxN maze using the specified algorithm.
@@ -41,13 +42,15 @@ maze generation:
   -n N                  maze size
   -a A                  maze generation algorithm
   --algs                list supported maze generation algorithms
-  -m M                  algorithm parameters, see alg list for details
+  -p P                  algorithm parameters, see alg list for details
   -s S                  random seed, use to generate repeatable mazes
 
 maze visualization:
   -d D                  simulation delay in seconds, can be a fraction
   --start_delay START_DELAY
                         start delay in seconds, can be a fraction
+  --animate {no,gen,sol,both}
+                        algorithms animation
   -w W                  tile width in px
 
 maze solving:
@@ -60,12 +63,32 @@ Rows and columns indices start with 0 in the top-right corner.
 $ python3 maze_client.py --algs
 List of supported maze generation algorithms:
 
-        0       Recursive split 50/50
-        1       Recursive split at random
-        2       Recursive backtracking
-        3       Hunt-and-kill
-        4       Binary tree (SE biased)
-        5       Growing tree (Prim's)
+        0       Recursive split
+                Parameters: ['halves', 'random']
+        1       Recursive backtracking
+        2       Hunt-and-kill
+        3       Kruskal's
+        4       Binary tree
+                Parameters: ['NE', 'NW', 'SE', 'SW']
+        5       Growing tree
+                Parameters: ['<policy:weight>[,<policy:weight>...]']
+
+All parameters are optional, algorithms use built-in defaults.
+    
+Growing tree algorithm supports following policies:
+
+    o|oldest,n|newest,r|random,m|middle
+
+Default policy is "r" which always select the oldest element from stack
+which effectively implements Prim's algorithm. Other interesting combinations:
+
+    n       Pick the newest cell on stack, implements Recursive Backtracking
+    o       Pick the oldest cell on stack, produces a curious degenerated maze
+    m       Pick a cell in the middle of stack, a variation of 'o'
+    n:1,r:1 Pick the newest or random cell with equal probability (50/50)
+    n:1,o:1 Pick the newest or oldest cell with equal probability (50/50)
+    n:2,o:1 Pick the newest or oldest cell with 2:1 ratio
+    o:1,r:1 Pick the oldest or random cell with equal probability (50/50)
 ```
 
 ## Examples
@@ -136,13 +159,13 @@ This allows simulation of combined strategies, for example picking the newest it
 
 #### Always pick a random cell - Prim's:
 
-`$ python3 maze_client.py -n 10 -w 30 -d 0.07 -a 5 -p 5:1  --finish 9 4`
+`$ python3 maze_client.py -n 10 -w 30 -s 3 -a 5 -p r --finish 9 4`
 
 ![](images/maze-gt-prim.gif)
 
 #### Oldest vs Oldest/Newest 1:1
 
-Picking always oldest creates a soft of degenerated maze, but once selection alternates between oldest and newest cell a nice looking maze is generated with longer streight sections but verall shorter passages (i.e. combination of recursive backtracking and degenerated always-oldest variant):
+Picking always oldest creates a sort of degenerated maze, but once selection alternates between oldest and newest cell a nice looking maze is generated with longer streight sections but verall shorter passages (i.e. combination of recursive backtracking and degenerated always-oldest variant):
 
 | Oldest |  Oldest/Newest 1:1 |
 | --- | --- |
@@ -150,8 +173,10 @@ Picking always oldest creates a soft of degenerated maze, but once selection alt
 
 Generated with:
 
-`$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p o --finish 9 4`
-`$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p o:1,n:1 --finish 9 4`
+```
+$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p o --finish 9 4
+$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p o:1,n:1 --finish 9 4
+```
 
 #### Newest vs Newest/Random 1:1
 
@@ -161,12 +186,27 @@ Always picking the newest cell results in recursive backtracking behavious, but 
 | --- | --- |
 | ![](images/maze-gt-str-n.gif) | ![](images/maze-gt-str-nr.gif) |
 
-#### Newest/Random/Oldest 1:1:2
+Generated with:
+
+```
+$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p n:1 --finish 9 4
+$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p n:1,r:1 --finish 9 4
+```
+
+#### Newest/Random/Oldest 2:1:1 vs Newest/Random/Oldest 1:1:2
+
+Fascinating to watch a significant the visual difference in algorithm progression with a slight change of how cells are picked:
+
+| Newest/Random/Oldest 2:1:1 |  Newest/Random/Oldest 1:1:2 |
+| --- | --- |
+| ![](images/maze-gt-str-n2ro.gif) | ![](images/maze-gt-str-nro2.gif) |
 
 Generated with:
 
-`$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p n:1 --finish 9 4`
-`$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p n:1,r:1 --finish 9 4`
+```
+$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p n:1,r:1,o:2 --finish 9 4
+$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p n:2,r:1,o:1 --finish 9 4
+```
 
 ## Links
 
