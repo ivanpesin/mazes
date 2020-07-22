@@ -36,6 +36,10 @@ class RecursiveSplit:
         self.mode = mode
         self.animate = animate
 
+        if mode in ('',None): mode = 'halves'
+        if mode not in ('h','halves','r','random'):
+            raise Exception('Invalid algorithm configuration, see alg description parameters')
+
         self.split(0,0,maze.N-1,maze.N-1,True)
 
     def split(self,r1,c1,r2,c2,vertical):
@@ -47,7 +51,7 @@ class RecursiveSplit:
 
         if vertical:
             # pick a column to split at
-            if self.mode == 'halves': pos = c1+(c2-c1)//2
+            if self.mode in ('h','halves'): pos = c1+(c2-c1)//2
             else: pos = c1 + random.randrange(c2-c1)
 
             for r in range(r1,r2+1):
@@ -67,7 +71,7 @@ class RecursiveSplit:
 
         else:
             # pick a raw to split at
-            if self.mode == 'halves': pos = r1 + (r2-r1)//2
+            if self.mode in ('h','halves'): pos = r1 + (r2-r1)//2
             else: pos = r1 + random.randrange(r2-r1)
 
             for c in range(c1,c2+1):
@@ -209,22 +213,36 @@ class HuntAndKill:
 
 class BinaryTree:
 
-    def __init__(self, maze, visualizer, animate=False):
+    def __init__(self, maze, visualizer, mode='SE', animate=False):
         self.maze = maze
         self.visualizer = visualizer
         self.animate = animate
+        self.mode = mode.upper() if mode is not None else 'SE'
+
+        if self.mode not in ('NW','NE','SW','SE'):
+            raise Exception('Invalid algorithm configuration, see alg description parameters')
 
         self.generate(0,0)
 
     def generate(self, r,c):
-        ''' Generates south-east biased maze '''
+        ''' Generates a maze '''
 
         for r in range(self.maze.N):
             for c in range(self.maze.N):
                 
                 headings = []
-                if r < self.maze.N-1: headings.append(mz.SOUTH)                
-                if c < self.maze.N-1: headings.append(mz.EAST)
+                if self.mode == 'NW':
+                    if r > 0:             headings.append(mz.NORTH)      
+                    if c > 0:             headings.append(mz.WEST)
+                elif self.mode == 'NE':
+                    if r > 0:             headings.append(mz.NORTH)      
+                    if c < self.maze.N-1: headings.append(mz.EAST)
+                elif self.mode == 'SW':
+                    if r < self.maze.N-1: headings.append(mz.SOUTH)                
+                    if c > 0:             headings.append(mz.WEST)
+                else: # 'SE'
+                    if r < self.maze.N-1: headings.append(mz.SOUTH)                
+                    if c < self.maze.N-1: headings.append(mz.EAST)
                 random.shuffle(headings)
 
                 if headings:
@@ -331,9 +349,7 @@ class Kruskals:
             if self.UF.connected(self.eid(r,c),self.eid(nr,nc)): continue
 
             self.visualizer.set_tile_state(r,c,mv.ST_VISITED)
-
             self.UF.union(self.eid(r,c),self.eid(nr,nc))
-
             self.maze.remove_wall(r,c, heading(r,c,nr,nc))
 
             # redraw only every third update

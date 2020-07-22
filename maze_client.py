@@ -11,21 +11,37 @@ import random
 import sys
 
 ALGS_LIST = [
-    'Recursive split 50/50',
-    'Recursive split at random',
-    'Recursive backtracking',
-    'Hunt-and-kill',
-    "Kruskal's",
-    'Binary tree (SE biased)',
-    "Growing tree (Prim's)",
+    { 'name': 'Recursive split', 'param': [ 'halves', 'random' ], 'walls': False },
+    { 'name': 'Recursive backtracking', 'param':  None, 'walls': True },
+    { 'name': 'Hunt-and-kill',   'param':  None, 'walls': True },
+    { 'name': "Kruskal's",       'param':  None, 'walls': True },
+    { 'name': 'Binary tree',     'param': [ 'NE','NW','SE','SW'], 'walls': True },
+    { 'name': 'Growing tree',    'param': [ '<policy:weight>[,<policy:weight>...]'], 'walls': True }
 ]
 
 def show_algs():
     ''' Lists supported maze generation algorithms '''
     print("List of supported maze generation algorithms:\n")
-    for i, name in enumerate(ALGS_LIST):
-        print("\t%d\t%s" % (i, name))
+    for i, desc in enumerate(ALGS_LIST):
+        print("\t%d\t%s" % (i, desc['name']))
+        if desc['param']: print("\t\tParameters: %s" % (desc['param'])) 
 
+    footer = '''
+All parameters are optional, algorithms use built-in defaults.
+    
+Growing tree algorithm supports following policies:
+
+    o|oldest,n|newest,r|random,m|middle
+
+Default policy is "r" which always select the oldest element from stack
+which effectively implements Prim's algorithm. Other interesting combinations:
+
+    n       Always select newest element from stack, 
+            implements Recursive Backtracking
+    
+'''
+    print(footer)
+    
     
 # --- main
 
@@ -37,7 +53,7 @@ parser_gen = parser.add_argument_group('maze generation')
 parser_gen.add_argument('-n',            default=10, type=int,  help="maze size")
 parser_gen.add_argument('-a',            default=0, type=int,   help="maze generation algorithm")
 parser_gen.add_argument('--algs',        action="store_true",   help="list supported maze generation algorithms")
-parser_gen.add_argument('-m',            type=str,  help="algorithm parameters, see alg list for details")
+parser_gen.add_argument('-p',            type=str,  help="algorithm parameters, see alg list for details")
 parser_gen.add_argument('-s',            default=None, type=int,help="random seed, use to generate repeatable mazes")
 
 parser_vis = parser.add_argument_group('maze visualization')
@@ -82,8 +98,7 @@ tk.lift()
 
 # create a maze; some algs start with an empty maze and build walls, 
 # others carve doors in a maze full of walls
-if args.a in [0,1]: m = maze.Maze(N=args.n, walls=False)
-else: m = maze.Maze(N=args.n)
+m = maze.Maze(N=args.n, walls=ALGS_LIST[args.a]['walls'])
 
 # create visualizator to use with generation and solving of the maze
 vis = maze_visualizer.MazeVisualizer(m, tk, tile_width=args.w, delay=args.d)
@@ -92,17 +107,26 @@ vis.set_statusbar('Start delay: %d sec ...' % args.start_delay)
 time.sleep(args.start_delay)
 
 # generating
-vis.set_statusbar('Generating the maze: %s' % ALGS_LIST[args.a])
+mode = None
+desc = ALGS_LIST[args.a]['name']
+if args.p:
+    mode = args.p
+    desc += " (%s)" % args.p
+vis.set_statusbar('Generating the maze: %s' % ALGS_LIST[args.a]['name'])
 
 animate = True if args.animate in [ 'gen','both' ] else False
 
-if   args.a == 0: maze_generators.RecursiveSplit(m,vis,animate=animate)
-elif args.a == 1: maze_generators.RecursiveSplit(m,vis,animate=animate,mode='random')
-elif args.a == 2: maze_generators.RecursiveBacktracking(m,vis,animate=animate)
-elif args.a == 3: maze_generators.HuntAndKill(m,vis,animate=animate)
-elif args.a == 4: maze_generators.Kruskals(m,vis,animate=animate)
-elif args.a == 5: maze_generators.BinaryTree(m,vis,animate=animate)
-elif args.a == 6: maze_generators.GrowingTree(m,vis,animate=animate)
+try:
+    if   args.a == 0: maze_generators.RecursiveSplit(m,vis,animate=animate,mode=mode)
+    elif args.a == 1: maze_generators.RecursiveBacktracking(m,vis,animate=animate)
+    elif args.a == 2: maze_generators.HuntAndKill(m,vis,animate=animate)
+    elif args.a == 3: maze_generators.Kruskals(m,vis,animate=animate)
+    elif args.a == 4: maze_generators.BinaryTree(m,vis,mode=mode,animate=animate)
+    elif args.a == 5: maze_generators.GrowingTree(m,vis,mode=mode,animate=animate)
+except Exception as err:
+    print(err)
+    sys.exit(2)
+
 
 
 vis.set_statusbar('Generated, sleeping 3 sec...')
