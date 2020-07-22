@@ -165,7 +165,7 @@ This allows simulation of combined strategies, for example picking the newest it
 
 #### Oldest vs Oldest/Newest 1:1
 
-Picking always oldest creates a sort of degenerated maze, but once selection alternates between oldest and newest cell a nice looking maze is generated with longer streight sections but verall shorter passages (i.e. combination of recursive backtracking and degenerated always-oldest variant):
+Picking always-oldest cell creates a sort of degenerated maze, but once selection alternates between oldest and newest cells a nice looking maze is generated with longer straight sections but overall shorter passages (i.e. combination of recursive backtracking and degenerated always-oldest variant):
 
 | Oldest |  Oldest/Newest 1:1 |
 | --- | --- |
@@ -180,7 +180,7 @@ $ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p o:1,n:1 --finish 
 
 #### Newest vs Newest/Random 1:1
 
-Always picking the newest cell results in recursive backtracking behavious, but if random picking is thrown in, the algorithm starts generating shorter passages with more options.
+Always picking the newest cell results in recursive backtracking behaviour, but if random picking is thrown in, the algorithm starts generating shorter passages with more options.
 
 | Newest |  Newest/Random 1:1 |
 | --- | --- |
@@ -195,7 +195,7 @@ $ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p n:1,r:1 --finish 
 
 #### Newest/Random/Oldest 2:1:1 vs Newest/Random/Oldest 1:1:2
 
-Fascinating to watch a significant the visual difference in algorithm progression with a slight change of how cells are picked:
+It's fascinating to watch a significant visual difference in algorithm progression with a slight change of how cells are picked:
 
 | Newest/Random/Oldest 2:1:1 |  Newest/Random/Oldest 1:1:2 |
 | --- | --- |
