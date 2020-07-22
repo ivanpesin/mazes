@@ -143,6 +143,6 @@ The algorithm becomes Prim's algorithm if the next cell is picked randomly from 
 - [x] Options to skip maze generation and solving animations
 - [ ] Refactor Maze class to store walls as a bitmap
 - [x] Refactor direction names
-- [ ] Parameters support for splitting alg
-- [ ] Parameters support for GT alg
+- [x] Parameters support for splitting alg
+- [x] Parameters support for GT alg
 - [x] Move tile state to visualizer

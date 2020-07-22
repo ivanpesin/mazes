@@ -28,6 +28,9 @@ def to_cell(r,c,h):
     if h == mz.EAST:  return (r,c+1)
     if h == mz.WEST:  return (r,c-1)
 
+class AlgConfigException(Exception):
+    pass
+
 class RecursiveSplit:
 
     def __init__(self, maze, visualizer, animate=False, mode='halves'):
@@ -38,7 +41,7 @@ class RecursiveSplit:
 
         if mode in ('',None): mode = 'halves'
         if mode not in ('h','halves','r','random'):
-            raise Exception('Invalid algorithm configuration, see alg description parameters')
+            raise AlgConfigException('Invalid algorithm configuration, see alg description parameters')
 
         self.split(0,0,maze.N-1,maze.N-1,True)
 
@@ -220,7 +223,7 @@ class BinaryTree:
         self.mode = mode.upper() if mode is not None else 'SE'
 
         if self.mode not in ('NW','NE','SW','SE'):
-            raise Exception('Invalid algorithm configuration, see alg description parameters')
+            raise AlgConfigException('Invalid algorithm configuration, see alg description parameters')
 
         self.generate(0,0)
 
@@ -263,11 +266,38 @@ class GrowingTree:
     3. Repeat #2 until C is empty.
     '''
 
-    def __init__(self, maze, visualizer, animate=False, mode='r'):
+    def canon_strategy(self, strategy) -> str:
+        if strategy.lower() in ('r','rand','random'): return 'r'
+        if strategy.lower() in ('o','old','oldest'):  return 'o'
+        if strategy.lower() in ('n','new','newest'):  return 'n'
+        if strategy.lower() in ('m','mid','middle'):  return 'm'
+        raise ValueError
+
+    def __init__(self, maze, visualizer, mode='r', animate=False):
         self.maze = maze
         self.visualizer = visualizer
-        self.mode = mode
         self.animate = animate
+
+        # mode processing
+        # creates a list with dicts of strategy->weight pairs
+        self.total_weight = 0
+        self.mode = []
+        if mode is not None:
+            for m in mode.split(','):
+                strategy = m
+                weight = 100
+                if ':' in m: strategy, weight = m.split(':',1)
+                try:
+                    strategy = self.canon_strategy(strategy)
+                    weight = int(weight)
+                except ValueError:
+                    raise AlgConfigException('Invalid algorithm configuration, see alg description parameters')
+                self.total_weight += weight
+                self.mode.append({'name': strategy, 'weight': self.total_weight})
+        else:
+            self.total_weight = 1
+            self.mode = [ { 'name': 'r', 'weight': 1 } ]
+        # /mode processing
 
         self.visited = [ [False] * maze.N for _ in range(maze.N) ]
 
@@ -282,10 +312,14 @@ class GrowingTree:
 
     def pick_cell(self):
         ''' picks a cell according to specified mode '''
-        if self.mode in ['r','random']: return random.choice(self.frontier)
-        if self.mode in ['n','new','newest']: return self.frontier[-1]
-        if self.mode in ['o','old','oldest']: return self.frontier[0]
-        if self.mode in ['m','mid','middle']: return self.frontier[len(self.frontier)//2]
+
+        w = random.randrange(self.total_weight)
+        for m in self.mode:
+            if w < m['weight']:
+                if m['name'] == "r": return random.choice(self.frontier)
+                if m['name'] == "n": return self.frontier[-1]
+                if m['name'] == "o": return self.frontier[0]
+                if m['name'] == "m": return self.frontier[len(self.frontier)//2]
 
     def grow(self):
 

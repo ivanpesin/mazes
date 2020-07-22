@@ -36,8 +36,13 @@ Growing tree algorithm supports following policies:
 Default policy is "r" which always select the oldest element from stack
 which effectively implements Prim's algorithm. Other interesting combinations:
 
-    n       Always select newest element from stack, 
-            implements Recursive Backtracking
+    n       Pick the newest cell on stack, implements Recursive Backtracking
+    o       Pick the oldest cell on stack, produces a curious degenerated maze
+    m       Pick a cell in the middle of stack, a variation of 'o'
+    n:1,r:1 Pick the newest or random cell with equal probability (50/50)
+    n:1,o:1 Pick the newest or oldest cell with equal probability (50/50)
+    n:2,o:1 Pick the newest or oldest cell with 2:1 ratio
+    o:1,r:1 Pick the oldest or random cell with equal probability (50/50)
     
 '''
     print(footer)
@@ -123,7 +128,7 @@ try:
     elif args.a == 3: maze_generators.Kruskals(m,vis,animate=animate)
     elif args.a == 4: maze_generators.BinaryTree(m,vis,mode=mode,animate=animate)
     elif args.a == 5: maze_generators.GrowingTree(m,vis,mode=mode,animate=animate)
-except Exception as err:
+except maze_generators.AlgConfigException as err:
     print(err)
     sys.exit(2)
 
