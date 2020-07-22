@@ -155,6 +155,8 @@ Generated with:
 
 #### Newest vs Newest/Random 1:1
 
+Always picking the newest cell results in recursive backtracking behavious, but if random picking is thrown in, the algorithm starts generating shorter passages with more options.
+
 | Newest |  Newest/Random 1:1 |
 | --- | --- |
 | ![](images/maze-gt-str-n.gif) | ![](images/maze-gt-str-nr.gif) |
