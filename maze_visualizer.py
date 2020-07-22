@@ -177,7 +177,7 @@ class MazeVisualizer:
                         fill=self.COLORS['START'],
                         width=3*self.wall_width)   
         else:
-            self.maze.add_tile_state(r1, c1, ST_START)
+            self.add_tile_state(r1, c1, ST_START)
             self.update_tk_maze(r1, c1)                  
         
         # handling r2,c2
@@ -206,7 +206,7 @@ class MazeVisualizer:
                         fill=self.COLORS['END'],
                         width=3*self.wall_width)
         else:
-            self.maze.add_tile_state(r2, c2, ST_END)     
+            self.add_tile_state(r2, c2, ST_END)     
             self.update_tk_maze(r2, c2)                    
 
     def update_tk_maze(self,r,c,redraw=False):
