@@ -18,7 +18,10 @@ Doing some research I found an abosultely amazing [Jamis Buck's blog](http://web
   - [Kruskal's algorithm](#kruskals-algorithm)
   - [Binary tree algorithm](#binary-tree-algorithm)
   - [Growing tree algorithm](#growing-tree-algorithm)
-    - [Prim's](#prims)
+    - [Always pick a random cell - Prim's:](#always-pick-a-random-cell---prims)
+    - [Oldest vs Oldest/Newest 1:1](#oldest-vs-oldestnewest-11)
+    - [Newest vs Newest/Random 1:1](#newest-vs-newestrandom-11)
+    - [Newest/Random/Oldest 1:1:2](#newestrandomoldest-112)
 - [Links](#links)
 - [TODO](#todo)
 
@@ -113,15 +116,55 @@ Does not require state, extremely simple to implement. The downside is an expres
 
 ### Growing tree algorithm
 
-An interesting algorithm which is simple to implement, while the behaviour can be changed with how you select next cell to process.
+An interesting algorithm which is simple to implement with the behaviour adjustable by how it selects the next cell to process:
 
-#### Prim's 
+- Create an empty bag to hold cells. Put one random cell in it
+- Pick a cell from the bag and remove a wall between it and any neighbouting unvisited cell. Add this new cell to the bag. If there are no unvisited neighbors, remove the cell from the bag
+- Repeat until no cells left in the bag
 
-The algorithm becomes Prim's algorithm if the next cell is picked randomly from the stack:
+Possible strategies for picking a cell from the bag:
 
-`$ python3 maze_client.py -n 10 -w 30 -d 0.07 -a 6  --finish 9 4`
+- always pick the most recently added item, which effectively recreates recursive backtracking algorithm
+- always pick a random item, in which case it becomes the Prim's MST algorithm where edges are selected randomly rather than by weight
+- always pick the oldest item in the bag; this generated a degenerated maze.
+
+The implementation allows to specify weighted strategies like so:
+
+   `-p <policy:weight>[,<policy:weight>,...]`
+
+This allows simulation of combined strategies, for example picking the newest item and a random item with 2:1 ration: `-p n:2,r:1`.
+
+#### Always pick a random cell - Prim's:
+
+`$ python3 maze_client.py -n 10 -w 30 -d 0.07 -a 5 -p 5:1  --finish 9 4`
 
 ![](images/maze-gt-prim.gif)
+
+#### Oldest vs Oldest/Newest 1:1
+
+Picking always oldest creates a soft of degenerated maze, but once selection alternates between oldest and newest cell a nice looking maze is generated with longer streight sections but verall shorter passages (i.e. combination of recursive backtracking and degenerated always-oldest variant):
+
+| Oldest |  Oldest/Newest 1:1 |
+| --- | --- |
+| ![](images/maze-gt-str-o.gif) | ![](images/maze-gt-str-no.gif) |
+
+Generated with:
+
+`$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p o --finish 9 4`
+`$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p o:1,n:1 --finish 9 4`
+
+#### Newest vs Newest/Random 1:1
+
+| Newest |  Newest/Random 1:1 |
+| --- | --- |
+| ![](images/maze-gt-str-n.gif) | ![](images/maze-gt-str-nr.gif) |
+
+#### Newest/Random/Oldest 1:1:2
+
+Generated with:
+
+`$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p n:1 --finish 9 4`
+`$ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p n:1,r:1 --finish 9 4`
 
 ## Links
 
@@ -146,3 +189,4 @@ The algorithm becomes Prim's algorithm if the next cell is picked randomly from 
 - [x] Parameters support for splitting alg
 - [x] Parameters support for GT alg
 - [x] Move tile state to visualizer
+- [ ] Update animations in README
