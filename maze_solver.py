@@ -88,7 +88,7 @@ class bfs:
         self.stack = [(start_row, start_col)]
         self.visited[start_row][start_col] = True
         # just using DEADEND color to mark visited tiles
-        self.visualizer.set_tile_state(start_row,start_col,mv.ST_DEADEND)
+        self.visualizer.add_tile_state(start_row,start_col,mv.ST_DEADEND)
 
         self.maze_solver()
 
@@ -121,15 +121,15 @@ class bfs:
                 self.path_to[nr][nc] = (r,c)
                 
                 # just using DEADEND color to mark visited cells
-                self.visualizer.set_tile_state(nr,nc,mv.ST_DEADEND,redraw=self.animate) 
+                self.visualizer.add_tile_state(nr,nc,mv.ST_DEADEND,redraw=self.animate) 
 
             self.stack.extend(nbrs)
 
         # mark the correct path
         (r,c) = (self.end_row,self.end_col)
         while (r,c) != (self.start_row,self.start_col):
-            self.visualizer.set_tile_state(r,c,mv.ST_CORRECT_PATH,redraw=self.animate)
+            self.visualizer.add_tile_state(r,c,mv.ST_CORRECT_PATH,redraw=self.animate)
             r,c = self.path_to[r][c]
 
-        self.visualizer.set_tile_state(r,c,mv.ST_CORRECT_PATH,redraw=self.animate)
+        self.visualizer.add_tile_state(r,c,mv.ST_CORRECT_PATH,redraw=self.animate)
         
