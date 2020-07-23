@@ -97,27 +97,27 @@ which effectively implements Prim's algorithm. Other interesting combinations:
 
 Recursive splitting 50/50 and opening a randomly positioned door:
 
-`$ python3 maze_client.py -n 10 -w 30 -d 0.2`
+`$ python3 maze_client.py -n 10 -w 30 -s 4 -d 0.07 -a 0 -p h --start 1 2 --finish 7 8 --solver bfs`
 
 ![](images/maze-split-halves.gif)
 
 Recursive splitting at a random point and opening a randomly positioned door:
 
-`$ python3 maze_client.py -n 10 -w 30 -d 0.2 -a 2`
+`$ python3 maze_client.py -n 10 -w 30 -s 7 -d 0.07 -a 0 -p r --start 1 1 --finish 8 9`
 
 ![](images/maze-split-random.gif)
 
 ### Recursive backtracking
 
-`$ python3 maze_client.py -n 10 -w 30 -d 0.2 -a 2`
+`$ python3 maze_client.py -n 10 -w 30 -s 4 -d 0.07 -a 1 --finish 5 5 --solver bfs`
 
 ![](images/maze-recursive-bt.gif)
 
 ### Hunt-and-kill
 
-Does not require backtracking, thus generates less windy passages
+Does not require backtracking, thus generates less windy passages.
 
-`$ python3 maze_client.py -n 10 -w 30 -a 3 -d 0.15 --start 4 4 --finish 9 4`
+`$ python3 maze_client.py -n 10 -w 30 -s 3 -d 0.07 -a 2 --start 4 4 --finish 9 4`
 
 ![](images/maze-hunt-and-kill.gif)
 
@@ -125,17 +125,20 @@ Does not require backtracking, thus generates less windy passages
 
 An easy to implement algorithm if you have UnionFind data structure. If you don't, UF is easy to implement too ;-)
 
-`python3 maze_client.py -n 10 -w 30 -d 0.07 -a 4 --solver bfs  --finish 9 4`
+`python3 maze_client.py -n 10 -w 30 -s 2 -d 0.07 -a 3 --solver bfs`
 
 ![](images/maze-kruskal.gif)
 
 ### Binary tree algorithm
 
-Does not require state, extremely simple to implement. The downside is an express bias; below example has a south-east bias.
+Does not require state, extremely simple to implement. The downside is an express bias;.
 
-`$ python3 maze_client.py -n 10 -w 30 -a 5 -d 0.07 --finish 9 4`
+`$ python3 maze_client.py -n 10 -w 30 -s 2 -d 0.07 -a 4 -p {nw|ne|sw|se}  --finish 9 4`
 
-![](images/maze-bt-se.gif)
+| Bias: | West  |  East |
+| ----- | :---: | :---: |
+| **North** | ![](images/maze-bt-nw.gif) | ![](images/maze-bt-ne.gif) |
+| **South** | ![](images/maze-bt-sw.gif) | ![](images/maze-bt-se.gif) |
 
 ### Growing tree algorithm
 
@@ -231,4 +234,4 @@ $ python3 maze_client.py -n 10 -w 30 --solver bfs -s 2 -a 5 -p n:2,r:1,o:1 --fin
 - [x] Parameters support for splitting alg
 - [x] Parameters support for GT alg
 - [x] Move tile state to visualizer
-- [ ] Update animations in README
+- [x] Update animations in README
